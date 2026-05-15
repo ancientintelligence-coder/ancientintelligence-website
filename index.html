@@ -227,12 +227,12 @@ body {
 
 /* ── Word-by-word reveal ──────────────────────────────────────────────────── */
 .ww {
-  display: inline-block;
+  display: inline;
   opacity: 0;
-  transform: translateY(8px);
-  transition: opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1);
+  transition: opacity .7s ease;
+  white-space: pre;
 }
-.ww.show { opacity: 1; transform: translateY(0); }
+.ww.show { opacity: 1; }
 .ww.ww-gold { color: #c8a96e; font-style: italic; }
 .ww.ww-italic { font-style: italic; }
 
@@ -282,6 +282,29 @@ body {
   transition: color 1.5s ease;
 }
 .iorg-year.show { color: rgba(200,169,110,.5); }
+
+/* ── Org wordmark dramatic animation ──────────────────────────────────────── */
+.iorg-wordmark {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(18px, 3vw, 40px);
+  font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: transparent;
+  background: linear-gradient(90deg, #c8a96e 0%, #fff8e8 50%, #c8a96e 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  margin-bottom: 24px; opacity: 0;
+  transition: opacity 1.5s ease;
+}
+.iorg-wordmark.show {
+  opacity: 1;
+  animation: goldShimmer 3s ease-in-out forwards;
+}
+@keyframes goldShimmer {
+  0%   { background-position: 200% center; letter-spacing: .08em; }
+  60%  { background-position: 0% center; }
+  100% { background-position: -50% center; letter-spacing: .20em; color: #c8a96e; }
+}
 
 /* ── Custom Cursor ─────────────────────────────────────────────────────────── */
 .cursor {
@@ -1446,7 +1469,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
       var isItalic = w.startsWith('_') && w.endsWith('_');
       var clean = w.replace(/[*_]/g, '');
       var cls = isGold ? 'ww-gold' : (isItalic ? 'ww-italic' : '');
-      return '<span class="ww ' + cls + '">' + clean + ' </span>';
+      return '<span class="ww ' + cls + '">' + clean + '</span> ';
     }).join('');
 
     var spans = el.querySelectorAll('.ww');
@@ -1466,7 +1489,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // ── 1. Hero ──────────────────────────────────────────────────────────
     {
       label: '—',
-      dur: 16000,
+      dur: 10000,
       build: function() {
         bodyEl.innerHTML = [
           '<span class="isec-label show">—</span>',
@@ -1476,8 +1499,8 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
           '</div>',
           '<p class="isub wblock" data-text="An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science."></p>',
         ].join('');
-        wordReveal(bodyEl.querySelector('.wline'),   110, 400);
-        wordReveal(bodyEl.querySelector('.wline-2'), 130, 2200);
+        wordReveal(bodyEl.querySelector('.wline'),   80, 400);
+        wordReveal(bodyEl.querySelector('.wline-2'), 90, 1800);
         timers.push(setTimeout(function() {
           var sub = bodyEl.querySelector('.wblock');
           if (sub) sub.classList.add('show');
@@ -1488,7 +1511,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // ── 2. Mission ────────────────────────────────────────────────────────
     {
       label: 'Our Mission',
-      dur: 15000,
+      dur: 9000,
       build: function() {
         bodyEl.innerHTML = [
           '<span class="isec-label show">Our Mission</span>',
@@ -1499,9 +1522,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
           '</div>',
           '<p class="isub wblock" data-text="Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level never before possible."></p>',
         ].join('');
-        wordReveal(bodyEl.querySelector('.wline'),   100, 500);
-        wordReveal(bodyEl.querySelector('.wline-2'), 100, 2000);
-        wordReveal(bodyEl.querySelector('.wline-3'), 120, 3500);
+        wordReveal(bodyEl.querySelector('.wline'),   75, 400);
+        wordReveal(bodyEl.querySelector('.wline-2'), 75, 1600);
+        wordReveal(bodyEl.querySelector('.wline-3'), 90, 2800);
         timers.push(setTimeout(function() {
           var sub = bodyEl.querySelector('.wblock');
           if (sub) sub.classList.add('show');
@@ -1512,7 +1535,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // ── 3. Conviction ─────────────────────────────────────────────────────
     {
       label: 'What We Believe',
-      dur: 17000,
+      dur: 10000,
       build: function() {
         bodyEl.innerHTML = [
           '<span class="isec-label show">What We Believe</span>',
@@ -1525,16 +1548,16 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
           '    <span class="iconv-t">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span></div>',
           '</div>',
         ].join('');
-        timers.push(setTimeout(function() { var e=document.getElementById('ic1'); if(e)e.classList.add('show'); }, 800));
-        timers.push(setTimeout(function() { var e=document.getElementById('ic2'); if(e)e.classList.add('show'); }, 4500));
-        timers.push(setTimeout(function() { var e=document.getElementById('ic3'); if(e)e.classList.add('show'); }, 8500));
+        timers.push(setTimeout(function() { var e=document.getElementById('ic1'); if(e)e.classList.add('show'); }, 600));
+        timers.push(setTimeout(function() { var e=document.getElementById('ic2'); if(e)e.classList.add('show'); }, 2800));
+        timers.push(setTimeout(function() { var e=document.getElementById('ic3'); if(e)e.classList.add('show'); }, 5500));
       }
     },
 
     // ── 4. Scope ──────────────────────────────────────────────────────────
     {
       label: 'The Scope',
-      dur: 15000,
+      dur: 9000,
       build: function() {
         bodyEl.innerHTML = [
           '<span class="isec-label show">The Scope</span>',
@@ -1543,7 +1566,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
           '</div>',
           '<p class="isub wblock" data-text="From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope."></p>',
         ].join('');
-        wordReveal(bodyEl.querySelector('.wline'), 150, 600);
+        wordReveal(bodyEl.querySelector('.wline'), 110, 500);
         timers.push(setTimeout(function() {
           var sub = bodyEl.querySelector('.wblock');
           if (sub) sub.classList.add('show');
@@ -1554,7 +1577,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // ── 5. Approach ───────────────────────────────────────────────────────
     {
       label: 'The Approach',
-      dur: 16000,
+      dur: 9000,
       build: function() {
         bodyEl.innerHTML = [
           '<span class="isec-label show">The Approach</span>',
@@ -1563,7 +1586,7 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
           '</div>',
           '<p class="isub wblock" data-text="We apply Vedic Astrology as an analytical lens across the full spectrum of human experience — from the intimate arc of a personal life to the grand movements of civilisations and world events. Every milestone, every turning point, every pattern hidden in plain sight. We follow the evidence — guided by the unwavering conviction that the patterns are there, and that we are only beginning to see them."></p>',
         ].join('');
-        wordReveal(bodyEl.querySelector('.wline'), 180, 600);
+        wordReveal(bodyEl.querySelector('.wline'), 120, 500);
         timers.push(setTimeout(function() {
           var sub = bodyEl.querySelector('.wblock');
           if (sub) sub.classList.add('show');
@@ -1574,8 +1597,12 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     // ── 6. Organisation ───────────────────────────────────────────────────
     {
       label: '',
-      dur: 12000,
+      dur: 8000,
       build: function() {
+        // Restart audio from beginning
+        audio.currentTime = 0;
+        audio.play().catch(function(){});
+        if (!muted) fadeVol(0.5, 1500);
         bodyEl.innerHTML = [
           '<div class="iorg">',
           '  <div class="iorg-wordmark" id="iorg-wm">Ancient Intelligence</div>',
@@ -1587,18 +1614,18 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         timers.push(setTimeout(function() {
           var e = document.getElementById('iorg-wm');
           if (e) e.classList.add('show');
-        }, 800));
+        }, 600));
         timers.push(setTimeout(function() {
           var sub = document.getElementById('iorg-sub');
           if (sub) sub.classList.add('show');
-        }, 2500));
+        }, 2000));
         timers.push(setTimeout(function() {
           var e = document.getElementById('iorg-yr');
           if (e) e.classList.add('show');
-        }, 5000));
+        }, 3500));
         timers.push(setTimeout(function() {
           ienter.classList.add('show');
-        }, 6000));
+        }, 4500));
       }
     }
 
