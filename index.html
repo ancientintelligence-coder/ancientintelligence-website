@@ -167,6 +167,46 @@ body {
   100% { opacity: 0; pointer-events: none; }
 }
 
+
+/* ── Entry screen ─────────────────────────────────────────────────────────── */
+#intro-entry {
+  position: absolute; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #000;
+  transition: opacity .8s ease;
+}
+#intro-entry.hide {
+  opacity: 0; pointer-events: none;
+}
+.entry-wordmark {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(14px, 1.8vw, 20px);
+  font-weight: 500; letter-spacing: .18em;
+  color: #c8a96e; margin-bottom: 60px;
+  text-transform: uppercase;
+}
+.entry-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: #c8a96e; background: transparent;
+  border: 1px solid rgba(200,169,110,.4);
+  padding: 16px 40px; border-radius: 2px;
+  cursor: pointer;
+  transition: all .3s ease;
+  position: relative; overflow: hidden;
+}
+.entry-btn:hover {
+  background: rgba(200,169,110,.08);
+  border-color: rgba(200,169,110,.8);
+  letter-spacing: .28em;
+}
+.entry-sub {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px; color: rgba(138,154,184,.4);
+  margin-top: 20px; letter-spacing: .05em;
+}
 /* ── Custom Cursor ─────────────────────────────────────────────────────────── */
 .cursor {
   position: fixed; width: 8px; height: 8px;
@@ -715,9 +755,16 @@ footer {
 
 <!-- Intro overlay -->
 <div id="intro-overlay">
+  <!-- Entry gate — guarantees audio plays -->
+  <div id="intro-entry">
+    <div class="entry-wordmark">Ancient Intelligence</div>
+    <button class="entry-btn" id="entry-btn">Enter Experience</button>
+    <div class="entry-sub">with sound · 30 seconds</div>
+  </div>
+
   <div id="intro-three"></div>
 
-  <div class="intro-ui">
+  <div class="intro-ui" id="intro-ui" style="opacity:0;transition:opacity 1s ease;">
     <div class="intro-wordmark" id="intro-wordmark">Ancient Intelligence</div>
 
     <!-- Section 1: Hero -->
@@ -778,6 +825,8 @@ footer {
     </div>
 
   </div>
+
+  </div><!-- /intro-ui -->
 
   <div class="intro-skip" id="intro-skip">Click anywhere to skip</div>
   <div class="intro-scroll-hint" id="intro-scroll-hint">↓ &nbsp; Enter</div>
@@ -1175,42 +1224,55 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // ── Audio ────────────────────────────────────────────────────────────────
   audio.volume = 0;
-  let audioStarted = false;
-
-  function startAudio() {
-    if (audioStarted) return;
-    audioStarted = true;
-    audio.play().then(() => {
-      fadeAudio(0.45, 2500);
-    }).catch(() => {});
-  }
 
   function fadeAudio(targetVol, duration) {
     const start = audio.volume;
-    const startTime = performance.now();
+    const st = performance.now();
     function step(now) {
-      const p = Math.min((now - startTime) / duration, 1);
+      const p = Math.min((now - st) / duration, 1);
       audio.volume = start + (targetVol - start) * p;
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
-  // Show a subtle "click to enable sound" hint
-  const soundHint = document.createElement('div');
-  soundHint.style.cssText = 'position:absolute;top:32px;right:32px;font-family:DM Mono,monospace;font-size:10px;letter-spacing:.12em;color:rgba(200,169,110,.5);text-transform:uppercase;border:1px solid rgba(200,169,110,.2);padding:8px 14px;border-radius:2px;pointer-events:none;';
-  soundHint.textContent = '♪ Click for sound';
-  overlay.appendChild(soundHint);
+  // ── Entry gate — user must click to enter, guaranteeing audio plays ───────
+  const entryEl  = document.getElementById('intro-entry');
+  const entryBtn = document.getElementById('entry-btn');
+  const introUI  = document.getElementById('intro-ui');
+  let   introStarted = false;
 
-  // Start audio on ANY interaction
-  function onFirstInteraction() {
-    startAudio();
-    soundHint.style.display = 'none';
+  function startExperience() {
+    if (introStarted) return;
+    introStarted = true;
+
+    // Start audio — this is inside a click handler so browser WILL allow it
+    audio.play().then(() => fadeAudio(0.45, 2500)).catch(() => {});
+
+    // Hide entry screen
+    entryEl.classList.add('hide');
+    setTimeout(() => { entryEl.style.display = 'none'; }, 900);
+
+    // Show intro UI
+    setTimeout(() => {
+      introUI.style.opacity = '1';
+      // Show hero section
+      secHero.classList.add('active');
+      requestAnimationFrame(() => requestAnimationFrame(() => secHero.classList.add('visible')));
+    }, 400);
+
+    // Start text schedule
+    scheduleStart = performance.now();
   }
-  overlay.addEventListener('click', onFirstInteraction, { once: true });
-  document.addEventListener('keydown', onFirstInteraction, { once: true });
-  // Also try autoplay (works in some browsers)
-  setTimeout(() => startAudio(), 100);
+
+  entryBtn.addEventListener('click', startExperience);
+
+  // Also allow keyboard
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') startExperience();
+  }, { once: true });
+
+  let scheduleStart = null;
 
   // ── Three.js Scene ───────────────────────────────────────────────────────
   const W = window.innerWidth, H = window.innerHeight;
@@ -1407,10 +1469,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }, hideEl ? 900 : 0);
   }
 
-  // Show hero section immediately
-  secHero.classList.add('active');
-  requestAnimationFrame(() => requestAnimationFrame(() => secHero.classList.add('visible')));
-
   const textSchedule = [
     // ── Hero section ──────────────────────────────────────────────────────
     { at: 1500,  fn: () => wordmark.classList.add('visible') },
@@ -1456,10 +1514,13 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     const t   = performance.now() - startTime;
     const sec = t / 1000;
 
-    // Text schedule
-    while (textState < textSchedule.length && t >= textSchedule[textState].at) {
-      textSchedule[textState].fn();
-      textState++;
+    // Text schedule — only runs after experience started
+    if (scheduleStart !== null) {
+      const st = performance.now() - scheduleStart;
+      while (textState < textSchedule.length && st >= textSchedule[textState].at) {
+        textSchedule[textState].fn();
+        textState++;
+      }
     }
 
     // ── Camera drift — slow cinematic pull inward ─────────────────────────
