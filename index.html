@@ -72,9 +72,11 @@ body {
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(13px, 1.4vw, 17px); font-weight: 300;
   color: rgba(138,154,184,0); line-height: 1.8;
-  margin-top: 28px; max-width: 580px;
+  margin-top: 28px; max-width: 620px;
+  text-align: center;
   transition: color 1.4s ease, opacity 1.4s ease;
   opacity: 0;
+  padding: 0 24px;
 }
 .intro-sub.visible { color: rgba(138,154,184,.85); opacity: 1; }
 
@@ -106,6 +108,45 @@ body {
   transition: color 1s ease; white-space: nowrap;
 }
 .intro-scroll-hint.visible { color: rgba(200,169,110,.5); }
+
+.intro-section {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 40px;
+  transition: opacity 1s ease;
+}
+.intro-section.hidden { opacity: 0; pointer-events: none; }
+.intro-section.fade-out { opacity: 0; pointer-events: none; transition: opacity .8s ease; }
+.intro-section-label {
+  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(200,169,110,.6); margin-bottom: 32px;
+  display: block; text-align: center;
+}
+.intro-conviction-list {
+  display: flex; flex-direction: column; gap: 0;
+  max-width: 700px; width: 100%;
+}
+.intro-conviction-item {
+  display: flex; align-items: flex-start; gap: 28px;
+  padding: 28px 0; border-bottom: 1px solid rgba(200,169,110,.12);
+  opacity: 0; transform: translateY(20px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
+}
+.intro-conviction-item:last-child { border-bottom: none; }
+.intro-conviction-item.visible { opacity: 1; transform: translateY(0); }
+.intro-conv-num {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: rgba(200,169,110,.7); letter-spacing: .1em;
+  padding-top: 6px; flex-shrink: 0;
+}
+.intro-conv-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2.2vw, 26px); font-weight: 300;
+  line-height: 1.4; color: #e4e8f4;
+}
+.intro-conv-text em { font-style: italic; color: #c8a96e; }
 
 #intro-overlay.fade-out {
   animation: introFadeOut 1.2s cubic-bezier(.4,0,1,1) forwards;
@@ -668,15 +709,63 @@ footer {
   <div class="intro-ui">
     <div class="intro-wordmark" id="intro-wordmark">Ancient Intelligence</div>
 
-    <div class="intro-text-block">
-      <div class="intro-line" id="iline1"><span>Vedic Astrology has guided</span></div>
-      <div class="intro-line" id="iline2"><span>humanity for <span class="em">millennia.</span></span></div>
-      <div class="intro-line" id="iline3"><span>We are here to <span class="em">witness why.</span></span></div>
-      <p class="intro-sub" id="intro-sub">
-        An initiative dedicated to witnessing the depth of Vedic Astrology —<br>
-        where ancient Jyotish wisdom meets the precision of modern data science.
-      </p>
+    <!-- Section 1: Hero -->
+    <div class="intro-section" id="isec-hero">
+      <div class="intro-section-label">—</div>
+      <div class="intro-text-block">
+        <div class="intro-line" id="iline1"><span>Vedic Astrology has guided</span></div>
+        <div class="intro-line" id="iline2"><span>humanity for <span class="em">millennia.</span></span></div>
+        <div class="intro-line" id="iline3"><span>We are here to <span class="em">witness why.</span></span></div>
+        <p class="intro-sub" id="intro-sub">
+          An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science.
+        </p>
+      </div>
     </div>
+
+    <!-- Section 2: Mission -->
+    <div class="intro-section hidden" id="isec-mission">
+      <div class="intro-section-label">Our Mission</div>
+      <div class="intro-text-block">
+        <div class="intro-line" id="iline-m1"><span>We are not here to question.</span></div>
+        <div class="intro-line" id="iline-m2"><span>We are not here to understand.</span></div>
+        <div class="intro-line" id="iline-m3"><span>We are here to <span class="em">witness.</span></span></div>
+        <p class="intro-sub" id="intro-sub-m">
+          Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level of understanding that has never before been possible.
+        </p>
+      </div>
+    </div>
+
+    <!-- Section 3: Conviction -->
+    <div class="intro-section hidden" id="isec-conviction">
+      <div class="intro-section-label">What We Believe</div>
+      <div class="intro-conviction-list">
+        <div class="intro-conviction-item" id="iconv1">
+          <span class="intro-conv-num">01</span>
+          <span class="intro-conv-text">The universe operates on <em>patterns.</em> Ancient observers mapped them with extraordinary precision across millennia.</span>
+        </div>
+        <div class="intro-conviction-item" id="iconv2">
+          <span class="intro-conv-num">02</span>
+          <span class="intro-conv-text">Vedic Astrology is a <em>living knowledge.</em> We are here to deepen and strengthen belief — not question it.</span>
+        </div>
+        <div class="intro-conviction-item" id="iconv3">
+          <span class="intro-conv-num">03</span>
+          <span class="intro-conv-text">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 4: Scope -->
+    <div class="intro-section hidden" id="isec-scope">
+      <div class="intro-section-label">The Scope</div>
+      <div class="intro-text-block">
+        <div class="intro-line" id="iline-s1"><span>Every life. Every moment.</span></div>
+        <div class="intro-line" id="iline-s2"><span>Every <span class="em">pattern.</span></span></div>
+        <p class="intro-sub" id="intro-sub-s">
+          From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope.
+        </p>
+      </div>
+    </div>
+
   </div>
 
   <div class="intro-skip" id="intro-skip">Click anywhere to skip</div>
@@ -1257,23 +1346,64 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // ── Text sequencing ───────────────────────────────────────────────────────
   let textState = 0;
-  const wordmark = document.getElementById('intro-wordmark');
-  const iline1   = document.getElementById('iline1');
-  const iline2   = document.getElementById('iline2');
-  const iline3   = document.getElementById('iline3');
-  const sub      = document.getElementById('intro-sub');
-  const skipEl   = document.getElementById('intro-skip');
-  const scrollHint = document.getElementById('intro-scroll-hint');
+  const wordmark  = document.getElementById('intro-wordmark');
+  const skipEl    = document.getElementById('intro-skip');
+  const scrollHint= document.getElementById('intro-scroll-hint');
+
+  // Section elements
+  const secHero       = document.getElementById('isec-hero');
+  const secMission    = document.getElementById('isec-mission');
+  const secConviction = document.getElementById('isec-conviction');
+  const secScope      = document.getElementById('isec-scope');
+
+  function showSection(hideEl, showEl, cb) {
+    if (hideEl) {
+      hideEl.classList.add('fade-out');
+      setTimeout(() => { hideEl.classList.add('hidden'); }, 900);
+    }
+    if (showEl) {
+      setTimeout(() => {
+        showEl.classList.remove('hidden');
+        requestAnimationFrame(() => showEl.style.opacity = '1');
+        if (cb) cb();
+      }, hideEl ? 800 : 0);
+    }
+  }
 
   const textSchedule = [
-    { at: 1200, fn: () => wordmark.classList.add('visible') },
-    { at: 2000, fn: () => skipEl.classList.add('visible') },
-    { at: 2500, fn: () => iline1.classList.add('visible') },
-    { at: 3400, fn: () => iline2.classList.add('visible') },
-    { at: 4300, fn: () => iline3.classList.add('visible') },
-    { at: 5400, fn: () => sub.classList.add('visible') },
-    { at: 8000, fn: () => scrollHint.classList.add('visible') },
-    { at: 10000,fn: () => endIntro() },
+    // ── Hero section ──────────────────────────────────────────────────────
+    { at: 1500,  fn: () => wordmark.classList.add('visible') },
+    { at: 2200,  fn: () => skipEl.classList.add('visible') },
+    { at: 3000,  fn: () => document.getElementById('iline1').classList.add('visible') },
+    { at: 4200,  fn: () => document.getElementById('iline2').classList.add('visible') },
+    { at: 5400,  fn: () => document.getElementById('iline3').classList.add('visible') },
+    { at: 7000,  fn: () => document.getElementById('intro-sub').classList.add('visible') },
+
+    // ── Mission section ───────────────────────────────────────────────────
+    { at: 10500, fn: () => showSection(secHero, secMission, () => {
+        setTimeout(() => document.getElementById('iline-m1').classList.add('visible'), 400);
+        setTimeout(() => document.getElementById('iline-m2').classList.add('visible'), 1400);
+        setTimeout(() => document.getElementById('iline-m3').classList.add('visible'), 2400);
+        setTimeout(() => document.getElementById('intro-sub-m').classList.add('visible'), 3800);
+    })},
+
+    // ── Conviction section ────────────────────────────────────────────────
+    { at: 16500, fn: () => showSection(secMission, secConviction, () => {
+        setTimeout(() => document.getElementById('iconv1').classList.add('visible'), 400);
+        setTimeout(() => document.getElementById('iconv2').classList.add('visible'), 1600);
+        setTimeout(() => document.getElementById('iconv3').classList.add('visible'), 2800);
+    })},
+
+    // ── Scope section ─────────────────────────────────────────────────────
+    { at: 22500, fn: () => showSection(secConviction, secScope, () => {
+        setTimeout(() => document.getElementById('iline-s1').classList.add('visible'), 400);
+        setTimeout(() => document.getElementById('iline-s2').classList.add('visible'), 1400);
+        setTimeout(() => document.getElementById('intro-sub-s').classList.add('visible'), 2800);
+    })},
+
+    // ── End ───────────────────────────────────────────────────────────────
+    { at: 27000, fn: () => scrollHint.classList.add('visible') },
+    { at: 32000, fn: () => endIntro() },
   ];
 
   // ── Render loop ───────────────────────────────────────────────────────────
@@ -1292,9 +1422,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }
 
     // ── Camera drift — slow cinematic pull inward ─────────────────────────
-    const camP = ease(clamp(sec / 8, 0, 1));
-    camera.position.x = Math.sin(sec * 0.04) * 1.5 * (1 - camP * 0.5);
-    camera.position.y = 2 - sec * 0.08 + Math.cos(sec * 0.03) * 0.5;
+    const camP = ease(clamp(sec / 20, 0, 1));
+    camera.position.x = Math.sin(sec * 0.02) * 1.5 * (1 - camP * 0.5);
+    camera.position.y = 2 - sec * 0.04 + Math.cos(sec * 0.015) * 0.5;
     camera.position.z = 18 - camP * 12;
     camera.lookAt(0, 0, 0);
 
@@ -1317,8 +1447,8 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     });
 
     // ── Ring group slow rotation ──────────────────────────────────────────
-    ringGroup.rotation.y = sec * 0.02;
-    ringGroup.rotation.x = Math.sin(sec * 0.01) * 0.05;
+    ringGroup.rotation.y = sec * 0.008;
+    ringGroup.rotation.x = Math.sin(sec * 0.005) * 0.05;
 
     // ── Planet orbits ─────────────────────────────────────────────────────
     const planetA = ease(prog(t, 2000, 4000));
@@ -1347,9 +1477,9 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     });
 
     // ── Stars slow rotation ───────────────────────────────────────────────
-    stars1.rotation.y = sec * 0.003;
-    stars2.rotation.y = sec * 0.002;
-    stars3.rotation.y = -sec * 0.001;
+    stars1.rotation.y = sec * 0.001;
+    stars2.rotation.y = sec * 0.0008;
+    stars3.rotation.y = -sec * 0.0005;
 
     renderer.render(scene, camera);
   }
