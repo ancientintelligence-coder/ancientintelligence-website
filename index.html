@@ -35,7 +35,7 @@ body {
 }
 
 
-/* ── Intro ──────────────────────────────────────────────────────────────────── */
+/* ── Intro ────────────────────────────────────────────────── */
 /* ── Intro ─────────────────────────────────────────────────────────────────── */
 #intro {
   position: fixed; inset: 0; z-index: 9999;
@@ -224,6 +224,64 @@ body {
   0%   { opacity: 1; }
   100% { opacity: 0; pointer-events: none; }
 }
+
+/* ── Word-by-word reveal ──────────────────────────────────────────────────── */
+.ww {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.16,1,.3,1);
+}
+.ww.show { opacity: 1; transform: translateY(0); }
+.ww.ww-gold { color: #c8a96e; font-style: italic; }
+.ww.ww-italic { font-style: italic; }
+
+/* ── Line styles ──────────────────────────────────────────────────────────── */
+.ilines { text-align: center; margin-bottom: 8px; }
+.wline {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300; line-height: 1.2;
+  font-size: clamp(30px, 4.8vw, 72px);
+  color: #f0f2f8; letter-spacing: -.01em;
+  margin: 0 0 4px 0; text-align: center;
+}
+.wline-gold .ww { color: #c8a96e; font-style: italic; }
+
+/* Subtitle block */
+.wblock {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(13px, 1.35vw, 16px); font-weight: 300;
+  color: rgba(138,154,184,0); line-height: 1.9;
+  margin-top: 32px; text-align: center;
+  max-width: 620px; width: 100%;
+  transition: color 1.8s ease, opacity 1.8s ease;
+  opacity: 0;
+}
+.wblock.show { color: rgba(138,154,184,.82); opacity: 1; }
+
+/* ── Organisation closing ─────────────────────────────────────────────────── */
+.iorg { text-align: center; }
+.iorg-wordmark {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(18px, 3vw, 40px);
+  font-weight: 500; letter-spacing: .16em;
+  text-transform: uppercase; color: rgba(200,169,110,0);
+  transition: color 2s ease; margin-bottom: 24px;
+}
+.iorg-wordmark.show { color: #c8a96e; }
+.iorg-line {
+  width: 60px; height: 1px;
+  background: rgba(200,169,110,.3);
+  margin: 0 auto 28px;
+}
+.iorg-year {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: .2em;
+  color: rgba(200,169,110,0); text-transform: uppercase;
+  margin-top: 20px;
+  transition: color 1.5s ease;
+}
+.iorg-year.show { color: rgba(200,169,110,.5); }
 
 /* ── Custom Cursor ─────────────────────────────────────────────────────────── */
 .cursor {
@@ -1187,15 +1245,7 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 
-// ── Sound toggle ──────────────────────────────────────────────────────────────
-const soundBtn2 = document.getElementById('sound-btn');
-let soundOn2 = false;
-soundBtn2.addEventListener('click', function() {
-  soundOn2 = !soundOn2;
-  soundBtn2.style.borderColor = soundOn2 ? 'var(--gold)' : '';
-});
-
-// ── INTRO ENGINE ─────────────────────────────────────────────────────────────
+// ── INTRO ENGINE v2 ───────────────────────────────────────────────────────────
 (function() {
   'use strict';
 
@@ -1212,12 +1262,14 @@ soundBtn2.addEventListener('click', function() {
   var audio    = document.getElementById('ia');
   var wrap     = document.getElementById('intro-canvas-wrap');
 
-  var muted    = false;
-  var ended    = false;
-  var sched    = null; // timestamp when experience started
+  var muted  = false;
+  var ended  = false;
+  var sched  = null;
+  var timers = [];
 
-  // ── Audio helpers ───────────────────────────────────────────────────────
+  // ── Audio ──────────────────────────────────────────────────────────────
   audio.volume = 0;
+
   function fadeVol(to, ms) {
     var from = audio.volume;
     var t0   = performance.now();
@@ -1229,14 +1281,13 @@ soundBtn2.addEventListener('click', function() {
     requestAnimationFrame(step);
   }
 
-  // Mute toggle
   imuteBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     muted = !muted;
     if (muted) {
       audio.volume = 0;
       imuteTxt.textContent = 'Unmute';
-      document.querySelector('.sound-waves').style.opacity = '.2';
+      document.querySelector('.sound-waves').style.opacity = '.15';
     } else {
       fadeVol(0.45, 800);
       imuteTxt.textContent = 'Mute';
@@ -1244,7 +1295,7 @@ soundBtn2.addEventListener('click', function() {
     }
   });
 
-  // ── Three.js ────────────────────────────────────────────────────────────
+  // ── Three.js ───────────────────────────────────────────────────────────
   var W = window.innerWidth, H = window.innerHeight;
   var renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -1258,7 +1309,6 @@ soundBtn2.addEventListener('click', function() {
   camera.position.set(0, 1.5, 16);
   camera.lookAt(0, 0, 0);
 
-  // Stars
   function mkStars(n, spread, sz, col) {
     var geo = new THREE.BufferGeometry();
     var pos = new Float32Array(n * 3);
@@ -1271,29 +1321,28 @@ soundBtn2.addEventListener('click', function() {
       pos[i*3+2] = r * Math.cos(ph);
     }
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    var mat = new THREE.PointsMaterial({
+    return new THREE.Points(geo, new THREE.PointsMaterial({
       color: col, size: sz, sizeAttenuation: true,
       transparent: true, opacity: 0
-    });
-    return new THREE.Points(geo, mat);
+    }));
   }
+
   var s1 = mkStars(5000, 90, .055, 0xc8b896);
   var s2 = mkStars(2000, 55, .04,  0xa898c8);
   var s3 = mkStars(600,  35, .09,  0xffeedd);
   scene.add(s1, s2, s3);
 
-  // Rings
   var ringGroup = new THREE.Group();
   scene.add(ringGroup);
   var ringMeshes = [
-    [1.1, Math.PI/4,   .3],
+    [1.1, Math.PI/4,   .30],
     [1.8, Math.PI/3,   .22],
     [2.6, Math.PI/2.4, .16],
     [3.6, Math.PI/6,   .11],
     [4.8, Math.PI/1.8, .07],
   ].map(function(r) {
-    var geo  = new THREE.TorusGeometry(r[0], .003, 2, 200);
-    var mat  = new THREE.MeshBasicMaterial({
+    var geo = new THREE.TorusGeometry(r[0], .003, 2, 200);
+    var mat = new THREE.MeshBasicMaterial({
       color: 0xc8a96e, transparent: true, opacity: 0,
       blending: THREE.AdditiveBlending
     });
@@ -1305,11 +1354,10 @@ soundBtn2.addEventListener('click', function() {
   });
   ringMeshes.forEach(function(m) { ringGroup.add(m); });
 
-  // Planets
   var planetData = [
-    {r:1.1, sp:.0005, tilt:Math.PI/4,   sz:.045, col:0xe8e0d0, off:.5},
+    {r:1.1, sp:.0004, tilt:Math.PI/4,   sz:.045, col:0xe8e0d0, off:.5 },
     {r:1.8, sp:.0003, tilt:Math.PI/3,   sz:.035, col:0xc8624e, off:2.1},
-    {r:2.6, sp:.0002, tilt:Math.PI/2.4, sz:.05,  col:0x8ab87a, off:.8},
+    {r:2.6, sp:.0002, tilt:Math.PI/2.4, sz:.05,  col:0x8ab87a, off:.8 },
     {r:3.6, sp:.00015,tilt:Math.PI/6,   sz:.04,  col:0xc8a97e, off:3.7},
     {r:4.8, sp:.0001, tilt:Math.PI/1.8, sz:.04,  col:0xe8d08a, off:1.4},
   ];
@@ -1326,7 +1374,6 @@ soundBtn2.addEventListener('click', function() {
     return m;
   });
 
-  // Core glow
   var glowM = new THREE.Mesh(
     new THREE.SphereGeometry(.08, 16, 16),
     new THREE.MeshBasicMaterial({color:0xc8a96e, transparent:true, opacity:0, blending:THREE.AdditiveBlending})
@@ -1337,12 +1384,10 @@ soundBtn2.addEventListener('click', function() {
   );
   scene.add(glowM, haloM);
 
-  // ── Easing ──────────────────────────────────────────────────────────────
   function ease(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
   function clamp(v,a,b) { return Math.max(a,Math.min(b,v)); }
   function prog(t,s,e) { return clamp((t-s)/(e-s),0,1); }
 
-  // ── Render loop (always running) ─────────────────────────────────────────
   var raf;
   var t0 = performance.now();
 
@@ -1350,24 +1395,15 @@ soundBtn2.addEventListener('click', function() {
     raf = requestAnimationFrame(animate);
     var t   = performance.now() - t0;
     var sec = t / 1000;
-
-    // Stars fade in
-    var sa = ease(prog(t, 0, 3000));
+    var sa  = ease(prog(t, 0, 3000));
     s1.material.opacity = sa * .65;
     s2.material.opacity = sa * .38;
     s3.material.opacity = sa * .85;
-
-    // Rings fade in
     ringMeshes.forEach(function(m, i) {
-      var ra = ease(prog(t, 800 + i*250, 2500 + i*250));
-      m.material.opacity = ra * m.userData.target;
+      m.material.opacity = ease(prog(t, 800+i*250, 2500+i*250)) * m.userData.target;
     });
-
-    // Ring rotation
     ringGroup.rotation.y = sec * .009;
     ringGroup.rotation.x = Math.sin(sec * .005) * .04;
-
-    // Planets
     var pa = ease(prog(t, 1500, 3500));
     planets.forEach(function(m) {
       var d = m.userData;
@@ -1377,193 +1413,264 @@ soundBtn2.addEventListener('click', function() {
       m.position.z = d.r * Math.sin(d.angle) * Math.cos(d.tilt) * .35;
       m.material.opacity = pa * .82;
     });
-
-    // Core glow pulse
     var ga = ease(prog(t, 600, 2000));
     var pulse = Math.sin(sec * 2.2) * .12 + .88;
     glowM.material.opacity = ga * pulse;
     haloM.material.opacity = ga * .07 * pulse;
     glowM.scale.setScalar(pulse);
-
-    // Star slow drift
     s1.rotation.y = sec * .0012;
     s2.rotation.y = sec * .0008;
     s3.rotation.y = -sec * .0005;
-
-    // Camera — slow pull in (only after experience starts)
     if (sched !== null) {
-      var et  = performance.now() - sched;
-      var esp = et / 1000;
-      var cp  = ease(clamp(esp / 22, 0, 1));
+      var esp = (performance.now() - sched) / 1000;
+      var cp  = ease(clamp(esp / 30, 0, 1));
       camera.position.x = Math.sin(esp * .018) * 1.4 * (1 - cp * .5);
-      camera.position.y = 1.5 - esp * .035 + Math.cos(esp * .013) * .4;
+      camera.position.y = 1.5 - esp * .028 + Math.cos(esp * .013) * .4;
       camera.position.z = 16 - cp * 10;
     }
     camera.lookAt(0, 0, 0);
-
     renderer.render(scene, camera);
   }
   animate();
 
-  // ── Content sections ─────────────────────────────────────────────────────
-  var sections = [
-    {
-      label: '—',
-      html: [
-        '<div class="iline" id="il1"><span>Vedic Astrology has guided</span></div>',
-        '<div class="iline" id="il2"><span>humanity for <span class="gold">millennia.</span></span></div>',
-        '<div class="iline" id="il3"><span>We are here to <span class="gold">witness why.</span></span></div>',
-        '<p class="isub" id="is1">An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science.</p>'
-      ].join(''),
-      seq: [
-        {at:1200, fn: function() { show('il1'); }},
-        {at:2600, fn: function() { show('il2'); }},
-        {at:4000, fn: function() { show('il3'); }},
-        {at:6000, fn: function() { show('is1'); }},
-      ]
-    },
-    {
-      label: 'Our Mission',
-      html: [
-        '<div class="iline" id="im1"><span>We are not here to question.</span></div>',
-        '<div class="iline" id="im2"><span>We are not here to understand.</span></div>',
-        '<div class="iline" id="im3"><span>We are here to <span class="gold">witness.</span></span></div>',
-        '<p class="isub" id="is2">Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level never before possible.</p>'
-      ].join(''),
-      seq: [
-        {at:800,  fn: function() { show('im1'); }},
-        {at:2000, fn: function() { show('im2'); }},
-        {at:3200, fn: function() { show('im3'); }},
-        {at:5000, fn: function() { show('is2'); }},
-      ]
-    },
-    {
-      label: 'What We Believe',
-      html: [
-        '<div class="iconv-list">',
-        '<div class="iconv" id="ic1"><span class="iconv-n">01</span><span class="iconv-t">The universe operates on <em>patterns.</em> Ancient observers mapped them with extraordinary precision across millennia.</span></div>',
-        '<div class="iconv" id="ic2"><span class="iconv-n">02</span><span class="iconv-t">Vedic Astrology is a <em>living knowledge.</em> We are here to deepen and strengthen belief — not question it.</span></div>',
-        '<div class="iconv" id="ic3"><span class="iconv-n">03</span><span class="iconv-t">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span></div>',
-        '</div>'
-      ].join(''),
-      seq: [
-        {at:600,  fn: function() { show('ic1'); }},
-        {at:1800, fn: function() { show('ic2'); }},
-        {at:3000, fn: function() { show('ic3'); }},
-      ]
-    },
-    {
-      label: 'The Scope',
-      html: [
-        '<div class="iline" id="is11"><span>Every life. Every moment.</span></div>',
-        '<div class="iline" id="is12"><span>Every <span class="gold">pattern.</span></span></div>',
-        '<p class="isub" id="is3">From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope.</p>'
-      ].join(''),
-      seq: [
-        {at:800,  fn: function() { show('is11'); }},
-        {at:2200, fn: function() { show('is12'); }},
-        {at:4000, fn: function() { show('is3'); }},
-      ]
-    }
-  ];
+  // ── Word-by-word reveal ─────────────────────────────────────────────────
+  // Wraps each word in a span and reveals them sequentially
+  function wordReveal(el, delayPerWord, initialDelay) {
+    if (!el) return;
+    var text = el.getAttribute('data-text') || el.textContent;
+    el.setAttribute('data-text', text);
+    var words = text.trim().split(/\s+/);
+    el.innerHTML = words.map(function(w) {
+      // preserve gold class for em words marked with *word*
+      var isGold = w.startsWith('*') && w.endsWith('*');
+      var isItalic = w.startsWith('_') && w.endsWith('_');
+      var clean = w.replace(/[*_]/g, '');
+      var cls = isGold ? 'ww-gold' : (isItalic ? 'ww-italic' : '');
+      return '<span class="ww ' + cls + '">' + clean + ' </span>';
+    }).join('');
 
-  function show(id) {
-    var el = document.getElementById(id);
-    if (el) {
-      requestAnimationFrame(function() {
-        el.classList.add('show');
-      });
-    }
+    var spans = el.querySelectorAll('.ww');
+    spans.forEach(function(s, i) {
+      timers.push(setTimeout(function() {
+        s.classList.add('show');
+      }, initialDelay + i * delayPerWord));
+    });
+
+    // Return total time
+    return initialDelay + words.length * delayPerWord;
   }
 
-  // Section timing: each section lasts ~9s
-  var secDurations = [9500, 8500, 8500, 9000];
-  var secTimers    = [];
+  // ── Sections ────────────────────────────────────────────────────────────
+  var sections = [
+
+    // ── 1. Hero ──────────────────────────────────────────────────────────
+    {
+      label: '—',
+      dur: 16000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<span class="isec-label show">—</span>',
+          '<div class="ilines">',
+          '  <p class="wline" data-text="Vedic Astrology has guided humanity for *millennia.*"></p>',
+          '  <p class="wline wline-2" data-text="We are here to *witness why.*"></p>',
+          '</div>',
+          '<p class="isub wblock" data-text="An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science."></p>',
+        ].join('');
+        wordReveal(bodyEl.querySelector('.wline'),   110, 400);
+        wordReveal(bodyEl.querySelector('.wline-2'), 130, 2200);
+        timers.push(setTimeout(function() {
+          var sub = bodyEl.querySelector('.wblock');
+          if (sub) sub.classList.add('show');
+        }, 5500));
+      }
+    },
+
+    // ── 2. Mission ────────────────────────────────────────────────────────
+    {
+      label: 'Our Mission',
+      dur: 15000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<span class="isec-label show">Our Mission</span>',
+          '<div class="ilines">',
+          '  <p class="wline" data-text="We are not here to question."></p>',
+          '  <p class="wline wline-2" data-text="We are not here to understand."></p>',
+          '  <p class="wline wline-3 wline-gold" data-text="We are here to *witness.*"></p>',
+          '</div>',
+          '<p class="isub wblock" data-text="Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level never before possible."></p>',
+        ].join('');
+        wordReveal(bodyEl.querySelector('.wline'),   100, 500);
+        wordReveal(bodyEl.querySelector('.wline-2'), 100, 2000);
+        wordReveal(bodyEl.querySelector('.wline-3'), 120, 3500);
+        timers.push(setTimeout(function() {
+          var sub = bodyEl.querySelector('.wblock');
+          if (sub) sub.classList.add('show');
+        }, 6000));
+      }
+    },
+
+    // ── 3. Conviction ─────────────────────────────────────────────────────
+    {
+      label: 'What We Believe',
+      dur: 17000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<span class="isec-label show">What We Believe</span>',
+          '<div class="iconv-list">',
+          '  <div class="iconv" id="ic1"><span class="iconv-n">01</span>',
+          '    <span class="iconv-t">The universe operates on <em>patterns.</em> Ancient observers mapped them with extraordinary precision across millennia.</span></div>',
+          '  <div class="iconv" id="ic2"><span class="iconv-n">02</span>',
+          '    <span class="iconv-t">Vedic Astrology is a <em>living knowledge.</em> We are here to deepen and strengthen belief — not question it.</span></div>',
+          '  <div class="iconv" id="ic3"><span class="iconv-n">03</span>',
+          '    <span class="iconv-t">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span></div>',
+          '</div>',
+        ].join('');
+        timers.push(setTimeout(function() { var e=document.getElementById('ic1'); if(e)e.classList.add('show'); }, 800));
+        timers.push(setTimeout(function() { var e=document.getElementById('ic2'); if(e)e.classList.add('show'); }, 4500));
+        timers.push(setTimeout(function() { var e=document.getElementById('ic3'); if(e)e.classList.add('show'); }, 8500));
+      }
+    },
+
+    // ── 4. Scope ──────────────────────────────────────────────────────────
+    {
+      label: 'The Scope',
+      dur: 15000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<span class="isec-label show">The Scope</span>',
+          '<div class="ilines">',
+          '  <p class="wline" data-text="Every life. Every moment. Every *pattern.*"></p>',
+          '</div>',
+          '<p class="isub wblock" data-text="From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope."></p>',
+        ].join('');
+        wordReveal(bodyEl.querySelector('.wline'), 150, 600);
+        timers.push(setTimeout(function() {
+          var sub = bodyEl.querySelector('.wblock');
+          if (sub) sub.classList.add('show');
+        }, 5000));
+      }
+    },
+
+    // ── 5. Approach ───────────────────────────────────────────────────────
+    {
+      label: 'The Approach',
+      dur: 16000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<span class="isec-label show">The Approach</span>',
+          '<div class="ilines">',
+          '  <p class="wline" data-text="Planets as *parameters.* Events as *data.* Patterns as *truth.*"></p>',
+          '</div>',
+          '<p class="isub wblock" data-text="We apply Vedic Astrology as an analytical lens across the full spectrum of human experience — from the intimate arc of a personal life to the grand movements of civilisations and world events. Every milestone, every turning point, every pattern hidden in plain sight. We follow the evidence — guided by the unwavering conviction that the patterns are there, and that we are only beginning to see them."></p>',
+        ].join('');
+        wordReveal(bodyEl.querySelector('.wline'), 180, 600);
+        timers.push(setTimeout(function() {
+          var sub = bodyEl.querySelector('.wblock');
+          if (sub) sub.classList.add('show');
+        }, 5500));
+      }
+    },
+
+    // ── 6. Organisation ───────────────────────────────────────────────────
+    {
+      label: '',
+      dur: 12000,
+      build: function() {
+        bodyEl.innerHTML = [
+          '<div class="iorg">',
+          '  <div class="iorg-wordmark" id="iorg-wm">Ancient Intelligence</div>',
+          '  <div class="iorg-line"></div>',
+          '  <p class="isub wblock" id="iorg-sub" data-text="A research initiative at the intersection of ancient Vedic wisdom and modern data science. We do not seek to prove or disprove. We seek to witness — and in witnessing, to understand."></p>',
+          '  <div class="iorg-year" id="iorg-yr">Est. 2026</div>',
+          '</div>',
+        ].join('');
+        timers.push(setTimeout(function() {
+          var e = document.getElementById('iorg-wm');
+          if (e) e.classList.add('show');
+        }, 800));
+        timers.push(setTimeout(function() {
+          var sub = document.getElementById('iorg-sub');
+          if (sub) sub.classList.add('show');
+        }, 2500));
+        timers.push(setTimeout(function() {
+          var e = document.getElementById('iorg-yr');
+          if (e) e.classList.add('show');
+        }, 5000));
+        timers.push(setTimeout(function() {
+          ienter.classList.add('show');
+        }, 6000));
+      }
+    }
+
+  ];
+
+  // ── Section loader ────────────────────────────────────────────────────
+  var curSec = 0;
 
   function loadSection(idx) {
     if (idx >= sections.length) {
-      // All done — end intro
-      setTimeout(endIntro, 2000);
+      setTimeout(endIntro, 2500);
       return;
     }
     var sec = sections[idx];
 
-    // Update label
-    var labelEl = document.getElementById('isec-label');
-    if (labelEl) {
-      labelEl.classList.remove('show');
-      setTimeout(function() {
-        labelEl.textContent = sec.label;
-        labelEl.classList.add('show');
-      }, 300);
-    }
-
-    // Fade out body, swap content, fade in
+    // Fade out body
     bodyEl.style.opacity = '0';
     bodyEl.style.transition = 'opacity .7s ease';
+
     setTimeout(function() {
-      bodyEl.innerHTML = '<span class="isec-label show" id="isec-label">' + sec.label + '</span>' + sec.html;
+      sec.build();
       bodyEl.style.opacity = '1';
 
-      // Run sequence
-      sec.seq.forEach(function(step) {
-        secTimers.push(setTimeout(step.fn, step.at));
-      });
-
       // Schedule next section
-      secTimers.push(setTimeout(function() {
+      timers.push(setTimeout(function() {
         loadSection(idx + 1);
-      }, secDurations[idx]));
+      }, sec.dur));
 
     }, idx === 0 ? 0 : 700);
   }
 
-  // ── Gate → Start ─────────────────────────────────────────────────────────
+  // ── Gate click ────────────────────────────────────────────────────────
   gateBtn.addEventListener('click', function() {
-    // Start audio — guaranteed inside click handler
+    // AUDIO — guaranteed inside click handler
     audio.play().then(function() {
-      if (!muted) fadeVol(0.45, 2500);
+      if (!muted) fadeVol(0.45, 3000);
     }).catch(function(){});
 
     // Hide gate
     gateEl.classList.add('hiding');
-    setTimeout(function() { gateEl.style.display = 'none'; }, 1000);
+    timers.push(setTimeout(function() { gateEl.style.display = 'none'; }, 1000));
 
     // Show content
     sched = performance.now();
-    setTimeout(function() {
+    timers.push(setTimeout(function() {
       contentEl.classList.add('show');
       itop.classList.add('show');
       loadSection(0);
-    }, 600);
-
-    // Show enter hint at end
-    setTimeout(function() {
-      ienter.classList.add('show');
-    }, 28000);
+    }, 700));
   });
 
-  // ── Skip ──────────────────────────────────────────────────────────────────
+  // ── Skip ──────────────────────────────────────────────────────────────
   iskip.addEventListener('click', function(e) {
     e.stopPropagation();
     endIntro();
   });
 
-  // ── End ───────────────────────────────────────────────────────────────────
+  // ── End ───────────────────────────────────────────────────────────────
   function endIntro() {
     if (ended) return;
     ended = true;
-    secTimers.forEach(clearTimeout);
+    timers.forEach(clearTimeout);
     cancelAnimationFrame(raf);
     fadeVol(0, 1200);
     introEl.classList.add('fade-out');
     setTimeout(function() {
       introEl.style.display = 'none';
       renderer.dispose();
-    }, 1300);
+    }, 1400);
   }
 
-  // ── Resize ────────────────────────────────────────────────────────────────
+  // ── Resize ────────────────────────────────────────────────────────────
   window.addEventListener('resize', function() {
     W = window.innerWidth; H = window.innerHeight;
     renderer.setSize(W, H);
