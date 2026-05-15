@@ -1399,37 +1399,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 })();
 
 
-// ── Scroll reveal ─────────────────────────────────────────────────────────────
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-
-
-const audio = document.getElementById('ambient-audio');
-const soundBtn = document.getElementById('sound-btn');
-const soundIcon = document.getElementById('sound-icon');
-let soundOn = false;
-audio.volume = 0.15;
-
-soundBtn.addEventListener('click', () => {
-  if (soundOn) {
-    audio.pause();
-    soundOn = false;
-    soundIcon.querySelector('.sound-waves') && (soundIcon.querySelector('.sound-waves').style.opacity = '.2');
-  } else {
-    audio.play().catch(() => {});
-    soundOn = true;
-    soundIcon.querySelector('.sound-waves') && (soundIcon.querySelector('.sound-waves').style.opacity = '1');
-  }
-});
 </script>
 </body>
 </html>
