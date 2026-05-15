@@ -50,6 +50,7 @@ body {
   pointer-events: none;
 }
 .intro-text-block {
+  text-align: center; width: 100%;
   text-align: center; padding: 0 40px;
 }
 .intro-line {
@@ -111,13 +112,19 @@ body {
 
 .intro-section {
   position: absolute; inset: 0;
-  display: flex; flex-direction: column;
+  display: none;
+  flex-direction: column;
   align-items: center; justify-content: center;
   padding: 80px 40px;
+  opacity: 0;
   transition: opacity 1s ease;
 }
-.intro-section.hidden { opacity: 0; pointer-events: none; }
-.intro-section.fade-out { opacity: 0; pointer-events: none; transition: opacity .8s ease; }
+.intro-section.active {
+  display: flex;
+}
+.intro-section.visible {
+  opacity: 1;
+}
 .intro-section-label {
   font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
   letter-spacing: .2em; text-transform: uppercase;
@@ -710,7 +717,7 @@ footer {
     <div class="intro-wordmark" id="intro-wordmark">Ancient Intelligence</div>
 
     <!-- Section 1: Hero -->
-    <div class="intro-section" id="isec-hero">
+    <div class="intro-section active" id="isec-hero">
       <div class="intro-section-label">—</div>
       <div class="intro-text-block">
         <div class="intro-line" id="iline1"><span>Vedic Astrology has guided</span></div>
@@ -723,7 +730,7 @@ footer {
     </div>
 
     <!-- Section 2: Mission -->
-    <div class="intro-section hidden" id="isec-mission">
+    <div class="intro-section" id="isec-mission">
       <div class="intro-section-label">Our Mission</div>
       <div class="intro-text-block">
         <div class="intro-line" id="iline-m1"><span>We are not here to question.</span></div>
@@ -736,7 +743,7 @@ footer {
     </div>
 
     <!-- Section 3: Conviction -->
-    <div class="intro-section hidden" id="isec-conviction">
+    <div class="intro-section" id="isec-conviction">
       <div class="intro-section-label">What We Believe</div>
       <div class="intro-conviction-list">
         <div class="intro-conviction-item" id="iconv1">
@@ -755,7 +762,7 @@ footer {
     </div>
 
     <!-- Section 4: Scope -->
-    <div class="intro-section hidden" id="isec-scope">
+    <div class="intro-section" id="isec-scope">
       <div class="intro-section-label">The Scope</div>
       <div class="intro-text-block">
         <div class="intro-line" id="iline-s1"><span>Every life. Every moment.</span></div>
@@ -1164,8 +1171,15 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // ── Audio ────────────────────────────────────────────────────────────────
   audio.volume = 0;
-  const playAttempt = audio.play();
-  if (playAttempt) playAttempt.catch(() => {});
+  let audioStarted = false;
+
+  function startAudio() {
+    if (audioStarted) return;
+    audioStarted = true;
+    audio.play().then(() => {
+      fadeAudio(0.45, 2500);
+    }).catch(() => {});
+  }
 
   function fadeAudio(targetVol, duration) {
     const start = audio.volume;
@@ -1177,7 +1191,12 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     }
     requestAnimationFrame(step);
   }
-  setTimeout(() => fadeAudio(0.45, 2500), 800);
+
+  // Try autoplay immediately
+  startAudio();
+  // Also start on first user interaction (browser policy fallback)
+  document.addEventListener('click', startAudio, { once: true });
+  document.addEventListener('keydown', startAudio, { once: true });
 
   // ── Three.js Scene ───────────────────────────────────────────────────────
   const W = window.innerWidth, H = window.innerHeight;
@@ -1358,17 +1377,25 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   function showSection(hideEl, showEl, cb) {
     if (hideEl) {
-      hideEl.classList.add('fade-out');
-      setTimeout(() => { hideEl.classList.add('hidden'); }, 900);
+      hideEl.classList.remove('visible');
+      setTimeout(() => { hideEl.classList.remove('active'); }, 900);
     }
-    if (showEl) {
-      setTimeout(() => {
-        showEl.classList.remove('hidden');
-        requestAnimationFrame(() => showEl.style.opacity = '1');
-        if (cb) cb();
-      }, hideEl ? 800 : 0);
-    }
+    setTimeout(() => {
+      if (showEl) {
+        showEl.classList.add('active');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            showEl.classList.add('visible');
+            if (cb) cb();
+          });
+        });
+      }
+    }, hideEl ? 900 : 0);
   }
+
+  // Show hero section immediately
+  secHero.classList.add('active');
+  requestAnimationFrame(() => requestAnimationFrame(() => secHero.classList.add('visible')));
 
   const textSchedule = [
     // ── Hero section ──────────────────────────────────────────────────────
