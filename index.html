@@ -50,11 +50,15 @@ body {
   pointer-events: none;
 }
 .intro-text-block {
-  text-align: center; width: 100%;
-  text-align: center; padding: 0 40px;
+  width: 100%; max-width: 900px;
+  text-align: center;
+  padding: 0 40px;
+  display: flex; flex-direction: column;
+  align-items: center;
 }
 .intro-line {
   display: block; overflow: hidden; margin-bottom: 4px;
+  width: 100%; text-align: center;
 }
 .intro-line span {
   display: block;
@@ -64,6 +68,7 @@ body {
   color: #f0f2f8; letter-spacing: -.01em;
   transform: translateY(100%);
   opacity: 0;
+  text-align: center;
   transition: transform 1.2s cubic-bezier(.16,1,.3,1), opacity 1.2s ease;
 }
 .intro-line span.em { color: #c8a96e; font-style: italic; }
@@ -72,12 +77,11 @@ body {
 .intro-sub {
   font-family: 'DM Sans', sans-serif;
   font-size: clamp(13px, 1.4vw, 17px); font-weight: 300;
-  color: rgba(138,154,184,0); line-height: 1.8;
-  margin-top: 28px; max-width: 620px;
+  color: rgba(138,154,184,0); line-height: 1.9;
+  margin-top: 28px; width: 100%; max-width: 600px;
   text-align: center;
   transition: color 1.4s ease, opacity 1.4s ease;
   opacity: 0;
-  padding: 0 24px;
 }
 .intro-sub.visible { color: rgba(138,154,184,.85); opacity: 1; }
 
@@ -1192,11 +1196,21 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     requestAnimationFrame(step);
   }
 
-  // Try autoplay immediately
-  startAudio();
-  // Also start on first user interaction (browser policy fallback)
-  document.addEventListener('click', startAudio, { once: true });
-  document.addEventListener('keydown', startAudio, { once: true });
+  // Show a subtle "click to enable sound" hint
+  const soundHint = document.createElement('div');
+  soundHint.style.cssText = 'position:absolute;top:32px;right:32px;font-family:DM Mono,monospace;font-size:10px;letter-spacing:.12em;color:rgba(200,169,110,.5);text-transform:uppercase;border:1px solid rgba(200,169,110,.2);padding:8px 14px;border-radius:2px;pointer-events:none;';
+  soundHint.textContent = '♪ Click for sound';
+  overlay.appendChild(soundHint);
+
+  // Start audio on ANY interaction
+  function onFirstInteraction() {
+    startAudio();
+    soundHint.style.display = 'none';
+  }
+  overlay.addEventListener('click', onFirstInteraction, { once: true });
+  document.addEventListener('keydown', onFirstInteraction, { once: true });
+  // Also try autoplay (works in some browsers)
+  setTimeout(() => startAudio(), 100);
 
   // ── Three.js Scene ───────────────────────────────────────────────────────
   const W = window.innerWidth, H = window.innerHeight;
