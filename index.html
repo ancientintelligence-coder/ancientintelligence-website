@@ -34,179 +34,197 @@ body {
   --white: #f0f2f8;
 }
 
-/* ── Intro Overlay ─────────────────────────────────────────────────────────── */
-#intro-overlay {
-  position: fixed; inset: 0; z-index: 10000;
-  background: #000; overflow: hidden; cursor: pointer;
+
+/* ── Intro ──────────────────────────────────────────────────────────────────── */
+/* ── Intro ─────────────────────────────────────────────────────────────────── */
+#intro {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #000;
+  font-family: 'DM Sans', sans-serif;
 }
-#intro-three {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-}
-.intro-ui {
+
+/* Entry gate */
+#intro-gate {
   position: absolute; inset: 0;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
+  z-index: 2; background: #000;
+  transition: opacity 1s ease;
+}
+#intro-gate.hiding { opacity: 0; pointer-events: none; }
+.gate-wordmark {
+  font-family: 'DM Mono', monospace;
+  font-size: clamp(13px, 1.6vw, 18px);
+  font-weight: 500; letter-spacing: .2em;
+  color: #c8a96e; text-transform: uppercase;
+  margin-bottom: 64px; opacity: 0;
+  animation: gFadeUp .8s .3s ease forwards;
+}
+.gate-btn {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: #c8a96e; background: transparent;
+  border: 1px solid rgba(200,169,110,.35);
+  padding: 18px 48px; cursor: pointer;
+  transition: all .4s ease; opacity: 0;
+  animation: gFadeUp .8s .7s ease forwards;
+}
+.gate-btn:hover {
+  background: rgba(200,169,110,.08);
+  border-color: rgba(200,169,110,.7);
+  letter-spacing: .3em;
+}
+.gate-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .1em;
+  color: rgba(138,154,184,.35); margin-top: 18px;
+  opacity: 0; animation: gFadeUp .8s 1.1s ease forwards;
+}
+@keyframes gFadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Three.js canvas */
+#intro-canvas-wrap {
+  position: absolute; inset: 0; z-index: 0;
+}
+
+/* Content overlay */
+#intro-content {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 1.2s ease;
   pointer-events: none;
 }
-.intro-text-block {
-  width: 100%; max-width: 900px;
-  text-align: center;
-  padding: 0 40px;
-  display: flex; flex-direction: column;
-  align-items: center;
+#intro-content.show { opacity: 1; }
+
+.intro-top {
+  position: absolute; top: 32px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(200,169,110,0);
+  transition: color 1.5s ease; white-space: nowrap;
 }
-.intro-line {
-  display: block; overflow: hidden; margin-bottom: 4px;
-  width: 100%; text-align: center;
+.intro-top.show { color: rgba(200,169,110,.65); }
+
+.intro-body {
+  text-align: center; padding: 0 5vw;
+  max-width: 960px; width: 100%;
 }
-.intro-line span {
+.iline {
+  display: block; overflow: hidden;
+  margin-bottom: 2px; text-align: center;
+}
+.iline span {
   display: block;
   font-family: 'Cormorant Garamond', serif;
   font-weight: 300; line-height: 1.15;
-  font-size: clamp(36px, 5.5vw, 80px);
+  font-size: clamp(32px, 5vw, 76px);
   color: #f0f2f8; letter-spacing: -.01em;
-  transform: translateY(100%);
-  opacity: 0;
-  text-align: center;
-  transition: transform 1.2s cubic-bezier(.16,1,.3,1), opacity 1.2s ease;
+  transform: translateY(105%); opacity: 0;
+  transition: transform 1.3s cubic-bezier(.16,1,.3,1),
+              opacity 1.3s ease;
 }
-.intro-line span.em { color: #c8a96e; font-style: italic; }
-.intro-line.visible span { transform: translateY(0); opacity: 1; }
+.iline span.gold { color: #c8a96e; font-style: italic; }
+.iline.show span { transform: translateY(0); opacity: 1; }
 
-.intro-sub {
+.isub {
   font-family: 'DM Sans', sans-serif;
-  font-size: clamp(13px, 1.4vw, 17px); font-weight: 300;
+  font-size: clamp(13px, 1.35vw, 16px); font-weight: 300;
   color: rgba(138,154,184,0); line-height: 1.9;
-  margin-top: 28px; width: 100%; max-width: 600px;
+  margin-top: 30px;
+  transition: color 1.5s ease, opacity 1.5s ease;
+  opacity: 0; text-align: center;
+}
+.isub.show { color: rgba(138,154,184,.82); opacity: 1; }
+
+.isec-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .22em;
+  text-transform: uppercase; color: rgba(200,169,110,.55);
+  margin-bottom: 36px; display: block;
   text-align: center;
-  transition: color 1.4s ease, opacity 1.4s ease;
-  opacity: 0;
-}
-.intro-sub.visible { color: rgba(138,154,184,.85); opacity: 1; }
-
-.intro-wordmark {
-  position: absolute; top: 32px; left: 50%; transform: translateX(-50%);
-  font-family: 'DM Mono', monospace; font-size: 12px;
-  font-weight: 500; letter-spacing: .18em; text-transform: uppercase;
-  color: rgba(200,169,110,0); transition: color 1s ease;
-  white-space: nowrap;
-}
-.intro-wordmark.visible { color: rgba(200,169,110,.7); }
-
-.intro-skip {
-  position: absolute; bottom: 32px; right: 32px;
-  font-family: 'DM Mono', monospace; font-size: 10px;
-  letter-spacing: .15em; color: rgba(200,169,110,.4);
-  text-transform: uppercase; pointer-events: none;
-  border: 1px solid rgba(200,169,110,.15);
-  padding: 8px 16px; border-radius: 2px;
   opacity: 0; transition: opacity 1s ease;
 }
-.intro-skip.visible { opacity: 1; }
+.isec-label.show { opacity: 1; }
 
-.intro-scroll-hint {
-  position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+/* Conviction items */
+.iconv-list {
+  max-width: 680px; width: 100%; margin: 0 auto;
+}
+.iconv {
+  display: flex; align-items: flex-start; gap: 24px;
+  padding: 24px 0; border-bottom: 1px solid rgba(200,169,110,.1);
+  opacity: 0; transform: translateY(16px);
+  transition: opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
+  text-align: left;
+}
+.iconv:last-child { border-bottom: none; }
+.iconv.show { opacity: 1; transform: translateY(0); }
+.iconv-n {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  color: rgba(200,169,110,.6); padding-top: 5px;
+  flex-shrink: 0; width: 20px;
+}
+.iconv-t {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(17px, 2vw, 24px); font-weight: 300;
+  line-height: 1.45; color: #e4e8f4;
+}
+.iconv-t em { font-style: italic; color: #c8a96e; }
+
+/* Bottom controls */
+.intro-bottom {
+  position: absolute; bottom: 32px;
+  left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  gap: 32px;
+}
+.intro-skip-btn {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: rgba(200,169,110,.4); background: transparent;
+  border: 1px solid rgba(200,169,110,.15);
+  padding: 8px 18px; cursor: pointer;
+  transition: all .2s; pointer-events: all;
+  opacity: 0; transition: opacity 1s ease, color .2s, border-color .2s;
+}
+.intro-skip-btn.show { opacity: 1; }
+.intro-skip-btn:hover { color: rgba(200,169,110,.8); border-color: rgba(200,169,110,.4); }
+
+.intro-mute-btn {
+  font-family: 'DM Mono', monospace; font-size: 10px;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(200,169,110,.4); background: transparent;
+  border: 1px solid rgba(200,169,110,.15);
+  padding: 8px 18px; cursor: pointer;
+  transition: color .2s, border-color .2s; pointer-events: all;
+  display: flex; align-items: center; gap: 7px;
+}
+.intro-mute-btn:hover { color: rgba(200,169,110,.8); border-color: rgba(200,169,110,.4); }
+
+.intro-enter-hint {
   font-family: 'DM Mono', monospace; font-size: 10px;
   letter-spacing: .15em; color: rgba(200,169,110,0);
-  text-transform: uppercase; text-align: center;
-  transition: color 1s ease; white-space: nowrap;
+  text-transform: uppercase;
+  transition: color 1.5s ease;
 }
-.intro-scroll-hint.visible { color: rgba(200,169,110,.5); }
+.intro-enter-hint.show { color: rgba(200,169,110,.4); }
 
-.intro-section {
-  position: absolute; inset: 0;
-  display: none;
-  flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 80px 40px;
-  opacity: 0;
-  transition: opacity 1s ease;
+/* Fade out */
+#intro.fade-out {
+  animation: introOut 1.2s ease forwards;
 }
-.intro-section.active {
-  display: flex;
-}
-.intro-section.visible {
-  opacity: 1;
-}
-.intro-section-label {
-  font-family: 'DM Mono', monospace; font-size: 10px; font-weight: 500;
-  letter-spacing: .2em; text-transform: uppercase;
-  color: rgba(200,169,110,.6); margin-bottom: 32px;
-  display: block; text-align: center;
-}
-.intro-conviction-list {
-  display: flex; flex-direction: column; gap: 0;
-  max-width: 700px; width: 100%;
-}
-.intro-conviction-item {
-  display: flex; align-items: flex-start; gap: 28px;
-  padding: 28px 0; border-bottom: 1px solid rgba(200,169,110,.12);
-  opacity: 0; transform: translateY(20px);
-  transition: opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
-}
-.intro-conviction-item:last-child { border-bottom: none; }
-.intro-conviction-item.visible { opacity: 1; transform: translateY(0); }
-.intro-conv-num {
-  font-family: 'DM Mono', monospace; font-size: 10px;
-  color: rgba(200,169,110,.7); letter-spacing: .1em;
-  padding-top: 6px; flex-shrink: 0;
-}
-.intro-conv-text {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(18px, 2.2vw, 26px); font-weight: 300;
-  line-height: 1.4; color: #e4e8f4;
-}
-.intro-conv-text em { font-style: italic; color: #c8a96e; }
-
-#intro-overlay.fade-out {
-  animation: introFadeOut 1.2s cubic-bezier(.4,0,1,1) forwards;
-}
-@keyframes introFadeOut {
+@keyframes introOut {
   0%   { opacity: 1; }
   100% { opacity: 0; pointer-events: none; }
 }
 
-
-/* ── Entry screen ─────────────────────────────────────────────────────────── */
-#intro-entry {
-  position: absolute; inset: 0; z-index: 10;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  background: #000;
-  transition: opacity .8s ease;
-}
-#intro-entry.hide {
-  opacity: 0; pointer-events: none;
-}
-.entry-wordmark {
-  font-family: 'DM Mono', monospace;
-  font-size: clamp(14px, 1.8vw, 20px);
-  font-weight: 500; letter-spacing: .18em;
-  color: #c8a96e; margin-bottom: 60px;
-  text-transform: uppercase;
-}
-.entry-btn {
-  font-family: 'DM Mono', monospace;
-  font-size: 11px; font-weight: 500;
-  letter-spacing: .2em; text-transform: uppercase;
-  color: #c8a96e; background: transparent;
-  border: 1px solid rgba(200,169,110,.4);
-  padding: 16px 40px; border-radius: 2px;
-  cursor: pointer;
-  transition: all .3s ease;
-  position: relative; overflow: hidden;
-}
-.entry-btn:hover {
-  background: rgba(200,169,110,.08);
-  border-color: rgba(200,169,110,.8);
-  letter-spacing: .28em;
-}
-.entry-sub {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 11px; color: rgba(138,154,184,.4);
-  margin-top: 20px; letter-spacing: .05em;
-}
 /* ── Custom Cursor ─────────────────────────────────────────────────────────── */
 .cursor {
   position: fixed; width: 8px; height: 8px;
@@ -745,91 +763,44 @@ footer {
 </head>
 <body>
 
-<!-- Intro audio -->
-<audio id="intro-audio" loop>
-  <source src="ambient.mp3" type="audio/mpeg">
-</audio>
 
-<!-- Three.js -->
+<!-- INTRO -->
+<audio id="ia" loop preload="auto"><source src="ambient.mp3" type="audio/mpeg"></audio>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-<!-- Intro overlay -->
-<div id="intro-overlay">
-  <!-- Entry gate — guarantees audio plays -->
-  <div id="intro-entry">
-    <div class="entry-wordmark">Ancient Intelligence</div>
-    <button class="entry-btn" id="entry-btn">Enter Experience</button>
-    <div class="entry-sub">with sound · 30 seconds</div>
+<div id="intro">
+
+  <!-- Three.js cosmos -->
+  <div id="intro-canvas-wrap"></div>
+
+  <!-- Entry gate -->
+  <div id="intro-gate">
+    <div class="gate-wordmark">Ancient Intelligence</div>
+    <button class="gate-btn" id="gate-btn">Enter Experience</button>
+    <div class="gate-hint">with sound · 30 seconds</div>
   </div>
 
-  <div id="intro-three"></div>
+  <!-- Content (hidden until gate clicked) -->
+  <div id="intro-content">
+    <div class="intro-top" id="itop">Ancient Intelligence</div>
 
-  <div class="intro-ui" id="intro-ui" style="opacity:0;transition:opacity 1s ease;">
-    <div class="intro-wordmark" id="intro-wordmark">Ancient Intelligence</div>
-
-    <!-- Section 1: Hero -->
-    <div class="intro-section active" id="isec-hero">
-      <div class="intro-section-label">—</div>
-      <div class="intro-text-block">
-        <div class="intro-line" id="iline1"><span>Vedic Astrology has guided</span></div>
-        <div class="intro-line" id="iline2"><span>humanity for <span class="em">millennia.</span></span></div>
-        <div class="intro-line" id="iline3"><span>We are here to <span class="em">witness why.</span></span></div>
-        <p class="intro-sub" id="intro-sub">
-          An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science.
-        </p>
-      </div>
+    <div class="intro-body" id="intro-body">
+      <!-- Filled by JS per section -->
     </div>
 
-    <!-- Section 2: Mission -->
-    <div class="intro-section" id="isec-mission">
-      <div class="intro-section-label">Our Mission</div>
-      <div class="intro-text-block">
-        <div class="intro-line" id="iline-m1"><span>We are not here to question.</span></div>
-        <div class="intro-line" id="iline-m2"><span>We are not here to understand.</span></div>
-        <div class="intro-line" id="iline-m3"><span>We are here to <span class="em">witness.</span></span></div>
-        <p class="intro-sub" id="intro-sub-m">
-          Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level of understanding that has never before been possible.
-        </p>
-      </div>
+    <div class="intro-bottom">
+      <button class="intro-mute-btn" id="imute">
+        <svg id="imute-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 4.5H1v3h1l3 2.5v-8L2 4.5z"/>
+          <path class="sound-waves" d="M8 3.5a3.5 3.5 0 010 5M9.5 2a6 6 0 010 8"/>
+        </svg>
+        <span id="imute-txt">Mute</span>
+      </button>
+      <div class="intro-enter-hint" id="ienter">↓ Enter</div>
+      <button class="intro-skip-btn show" id="iskip">Skip</button>
     </div>
-
-    <!-- Section 3: Conviction -->
-    <div class="intro-section" id="isec-conviction">
-      <div class="intro-section-label">What We Believe</div>
-      <div class="intro-conviction-list">
-        <div class="intro-conviction-item" id="iconv1">
-          <span class="intro-conv-num">01</span>
-          <span class="intro-conv-text">The universe operates on <em>patterns.</em> Ancient observers mapped them with extraordinary precision across millennia.</span>
-        </div>
-        <div class="intro-conviction-item" id="iconv2">
-          <span class="intro-conv-num">02</span>
-          <span class="intro-conv-text">Vedic Astrology is a <em>living knowledge.</em> We are here to deepen and strengthen belief — not question it.</span>
-        </div>
-        <div class="intro-conviction-item" id="iconv3">
-          <span class="intro-conv-num">03</span>
-          <span class="intro-conv-text">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 4: Scope -->
-    <div class="intro-section" id="isec-scope">
-      <div class="intro-section-label">The Scope</div>
-      <div class="intro-text-block">
-        <div class="intro-line" id="iline-s1"><span>Every life. Every moment.</span></div>
-        <div class="intro-line" id="iline-s2"><span>Every <span class="em">pattern.</span></span></div>
-        <p class="intro-sub" id="intro-sub-s">
-          From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope.
-        </p>
-      </div>
-    </div>
-
   </div>
 
-  </div><!-- /intro-ui -->
-
-  <div class="intro-skip" id="intro-skip">Click anywhere to skip</div>
-  <div class="intro-scroll-hint" id="intro-scroll-hint">↓ &nbsp; Enter</div>
 </div>
 
 <!-- Custom cursor -->
@@ -1215,420 +1186,393 @@ const observer = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// ── Intro — Three.js Cosmic Experience ───────────────────────────────────────
+
+// ── Sound toggle ──────────────────────────────────────────────────────────────
+const soundBtn2 = document.getElementById('sound-btn');
+let soundOn2 = false;
+soundBtn2.addEventListener('click', function() {
+  soundOn2 = !soundOn2;
+  soundBtn2.style.borderColor = soundOn2 ? 'var(--gold)' : '';
+});
+
+// ── INTRO ENGINE ─────────────────────────────────────────────────────────────
 (function() {
-  const overlay   = document.getElementById('intro-overlay');
-  const container = document.getElementById('intro-three');
-  const audio     = document.getElementById('intro-audio');
-  let   skipped   = false;
+  'use strict';
 
-  // ── Audio ────────────────────────────────────────────────────────────────
+  var introEl  = document.getElementById('intro');
+  var gateEl   = document.getElementById('intro-gate');
+  var gateBtn  = document.getElementById('gate-btn');
+  var contentEl= document.getElementById('intro-content');
+  var itop     = document.getElementById('itop');
+  var bodyEl   = document.getElementById('intro-body');
+  var ienter   = document.getElementById('ienter');
+  var iskip    = document.getElementById('iskip');
+  var imuteBtn = document.getElementById('imute');
+  var imuteTxt = document.getElementById('imute-txt');
+  var audio    = document.getElementById('ia');
+  var wrap     = document.getElementById('intro-canvas-wrap');
+
+  var muted    = false;
+  var ended    = false;
+  var sched    = null; // timestamp when experience started
+
+  // ── Audio helpers ───────────────────────────────────────────────────────
   audio.volume = 0;
-
-  function fadeAudio(targetVol, duration) {
-    const start = audio.volume;
-    const st = performance.now();
-    function step(now) {
-      const p = Math.min((now - st) / duration, 1);
-      audio.volume = start + (targetVol - start) * p;
+  function fadeVol(to, ms) {
+    var from = audio.volume;
+    var t0   = performance.now();
+    function step(t) {
+      var p = Math.min((t - t0) / ms, 1);
+      audio.volume = from + (to - from) * p;
       if (p < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
-  // ── Entry gate — user must click to enter, guaranteeing audio plays ───────
-  const entryEl  = document.getElementById('intro-entry');
-  const entryBtn = document.getElementById('entry-btn');
-  const introUI  = document.getElementById('intro-ui');
-  let   introStarted = false;
+  // Mute toggle
+  imuteBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    muted = !muted;
+    if (muted) {
+      audio.volume = 0;
+      imuteTxt.textContent = 'Unmute';
+      document.querySelector('.sound-waves').style.opacity = '.2';
+    } else {
+      fadeVol(0.45, 800);
+      imuteTxt.textContent = 'Mute';
+      document.querySelector('.sound-waves').style.opacity = '1';
+    }
+  });
 
-  function startExperience() {
-    if (introStarted) return;
-    introStarted = true;
-
-    // Start audio — this is inside a click handler so browser WILL allow it
-    audio.play().then(() => fadeAudio(0.45, 2500)).catch(() => {});
-
-    // Hide entry screen
-    entryEl.classList.add('hide');
-    setTimeout(() => { entryEl.style.display = 'none'; }, 900);
-
-    // Show intro UI
-    setTimeout(() => {
-      introUI.style.opacity = '1';
-      // Show hero section
-      secHero.classList.add('active');
-      requestAnimationFrame(() => requestAnimationFrame(() => secHero.classList.add('visible')));
-    }, 400);
-
-    // Start text schedule
-    scheduleStart = performance.now();
-  }
-
-  entryBtn.addEventListener('click', startExperience);
-
-  // Also allow keyboard
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') startExperience();
-  }, { once: true });
-
-  let scheduleStart = null;
-
-  // ── Three.js Scene ───────────────────────────────────────────────────────
-  const W = window.innerWidth, H = window.innerHeight;
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  // ── Three.js ────────────────────────────────────────────────────────────
+  var W = window.innerWidth, H = window.innerHeight;
+  var renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
-  renderer.setClearColor(0x000408, 1);
-  container.appendChild(renderer.domElement);
+  renderer.setClearColor(0x010610, 1);
+  wrap.appendChild(renderer.domElement);
 
-  const scene  = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 2000);
-  camera.position.set(0, 0, 5);
+  var scene  = new THREE.Scene();
+  scene.fog  = new THREE.FogExp2(0x010610, 0.028);
+  var camera = new THREE.PerspectiveCamera(60, W/H, 0.1, 2000);
+  camera.position.set(0, 1.5, 16);
+  camera.lookAt(0, 0, 0);
 
-  // ── Fog ──────────────────────────────────────────────────────────────────
-  scene.fog = new THREE.FogExp2(0x000408, 0.035);
-
-  // ── Star field — 3 layers ────────────────────────────────────────────────
-  function makeStarField(count, spread, size, color) {
-    const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const theta = Math.random() * Math.PI * 2;
-      const phi   = Math.acos(2 * Math.random() - 1);
-      const r     = spread * (0.3 + Math.random() * 0.7);
-      pos[i*3]   = r * Math.sin(phi) * Math.cos(theta);
-      pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
-      pos[i*3+2] = r * Math.cos(phi);
+  // Stars
+  function mkStars(n, spread, sz, col) {
+    var geo = new THREE.BufferGeometry();
+    var pos = new Float32Array(n * 3);
+    for (var i = 0; i < n; i++) {
+      var th = Math.random() * Math.PI * 2;
+      var ph = Math.acos(2 * Math.random() - 1);
+      var r  = spread * (.3 + Math.random() * .7);
+      pos[i*3]   = r * Math.sin(ph) * Math.cos(th);
+      pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
+      pos[i*3+2] = r * Math.cos(ph);
     }
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const mat = new THREE.PointsMaterial({
-      color, size, sizeAttenuation: true,
+    var mat = new THREE.PointsMaterial({
+      color: col, size: sz, sizeAttenuation: true,
       transparent: true, opacity: 0
     });
     return new THREE.Points(geo, mat);
   }
+  var s1 = mkStars(5000, 90, .055, 0xc8b896);
+  var s2 = mkStars(2000, 55, .04,  0xa898c8);
+  var s3 = mkStars(600,  35, .09,  0xffeedd);
+  scene.add(s1, s2, s3);
 
-  const stars1 = makeStarField(4000, 80,  0.06, 0xc8b896);
-  const stars2 = makeStarField(2000, 50,  0.04, 0xa090c0);
-  const stars3 = makeStarField(800,  30,  0.08, 0xffeedd);
-  scene.add(stars1, stars2, stars3);
-
-  // ── Nebula — glowing particle clouds ─────────────────────────────────────
-  function makeNebula(count, cx, cy, cz, spread, color) {
-    const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i*3]   = cx + (Math.random() - 0.5) * spread;
-      pos[i*3+1] = cy + (Math.random() - 0.5) * spread * 0.6;
-      pos[i*3+2] = cz + (Math.random() - 0.5) * spread * 0.4;
-    }
-    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const mat = new THREE.PointsMaterial({
-      color, size: 0.12, sizeAttenuation: true,
-      transparent: true, opacity: 0,
-      blending: THREE.AdditiveBlending, depthWrite: false
-    });
-    return new THREE.Points(geo, mat);
-  }
-
-  const neb1 = makeNebula(600, -8,  3, -20, 18, 0x2a1a6e);
-  const neb2 = makeNebula(500,  10, -4, -25, 14, 0x6e1a2a);
-  const neb3 = makeNebula(400,  0,  0,  -15, 10, 0x1a4a2a);
-  scene.add(neb1, neb2, neb3);
-
-  // ── Orbital rings ─────────────────────────────────────────────────────────
-  const ringGroup = new THREE.Group();
+  // Rings
+  var ringGroup = new THREE.Group();
   scene.add(ringGroup);
-
-  function makeRing(radius, tilt, color, opacity) {
-    const geo = new THREE.TorusGeometry(radius, 0.003, 2, 200);
-    const mat = new THREE.MeshBasicMaterial({
-      color, transparent: true, opacity: 0,
-      blending: THREE.AdditiveBlending
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.rotation.x = tilt;
-    mesh.rotation.z = Math.random() * 0.3;
-    mesh.userData.targetOpacity = opacity;
-    return mesh;
-  }
-
-  const rings = [
-    makeRing(1.2, Math.PI/4,    0xc8a96e, 0.35),
-    makeRing(1.9, Math.PI/3,    0xc8a96e, 0.25),
-    makeRing(2.8, Math.PI/2.5,  0xc8a96e, 0.18),
-    makeRing(3.8, Math.PI/6,    0xb09060, 0.12),
-    makeRing(5.0, Math.PI/1.8,  0xb09060, 0.08),
-  ];
-  rings.forEach(r => ringGroup.add(r));
-
-  // ── Orbiting planet spheres ───────────────────────────────────────────────
-  const planets = [
-    { radius: 1.2, speed: 0.0004, tilt: Math.PI/4,   size: 0.04, color: 0xe8e0d0, offset: 0.5  },
-    { radius: 1.9, speed: 0.0003, tilt: Math.PI/3,   size: 0.035,color: 0xc8624e, offset: 2.1  },
-    { radius: 2.8, speed: 0.0002, tilt: Math.PI/2.5, size: 0.05, color: 0x8ab87a, offset: 0.8  },
-    { radius: 3.8, speed: 0.00015,tilt: Math.PI/6,   size: 0.045,color: 0xc8a97e, offset: 3.7  },
-    { radius: 5.0, speed: 0.0001, tilt: Math.PI/1.8, size: 0.04, color: 0xe8d08a, offset: 1.4  },
-  ];
-
-  const planetMeshes = planets.map(p => {
-    const geo  = new THREE.SphereGeometry(p.size, 8, 8);
-    const mat  = new THREE.MeshBasicMaterial({
-      color: p.color, transparent: true, opacity: 0,
-      blending: THREE.AdditiveBlending
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.userData = { ...p, angle: p.offset };
-    scene.add(mesh);
-    return mesh;
-  });
-
-  // ── Central glow ──────────────────────────────────────────────────────────
-  const glowGeo = new THREE.SphereGeometry(0.08, 16, 16);
-  const glowMat = new THREE.MeshBasicMaterial({
-    color: 0xc8a96e, transparent: true, opacity: 0,
-    blending: THREE.AdditiveBlending
-  });
-  const glow = new THREE.Mesh(glowGeo, glowMat);
-  scene.add(glow);
-
-  // Outer glow halo
-  const haloGeo = new THREE.SphereGeometry(0.35, 16, 16);
-  const haloMat = new THREE.MeshBasicMaterial({
-    color: 0xc8a96e, transparent: true, opacity: 0,
-    blending: THREE.AdditiveBlending, side: THREE.BackSide
-  });
-  const halo = new THREE.Mesh(haloGeo, haloMat);
-  scene.add(halo);
-
-  // ── Constellation lines ───────────────────────────────────────────────────
-  const lineGroup = new THREE.Group();
-  scene.add(lineGroup);
-
-  function makeConstellationLine(x1,y1,z1, x2,y2,z2) {
-    const geo = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(x1,y1,z1),
-      new THREE.Vector3(x2,y2,z2)
-    ]);
-    const mat = new THREE.LineBasicMaterial({
+  var ringMeshes = [
+    [1.1, Math.PI/4,   .3],
+    [1.8, Math.PI/3,   .22],
+    [2.6, Math.PI/2.4, .16],
+    [3.6, Math.PI/6,   .11],
+    [4.8, Math.PI/1.8, .07],
+  ].map(function(r) {
+    var geo  = new THREE.TorusGeometry(r[0], .003, 2, 200);
+    var mat  = new THREE.MeshBasicMaterial({
       color: 0xc8a96e, transparent: true, opacity: 0,
       blending: THREE.AdditiveBlending
     });
-    return new THREE.Line(geo, mat);
-  }
+    var m = new THREE.Mesh(geo, mat);
+    m.rotation.x = r[1];
+    m.rotation.z = Math.random() * .3;
+    m.userData.target = r[2];
+    return m;
+  });
+  ringMeshes.forEach(function(m) { ringGroup.add(m); });
 
-  const constLines = [
-    makeConstellationLine(-2,1,-1,  -1,2,-0.5),
-    makeConstellationLine(-1,2,-0.5, 0,1.5,-0.2),
-    makeConstellationLine(0,1.5,-0.2, 1,2.2,-0.8),
-    makeConstellationLine(1,2.2,-0.8, 2,1.8,-1),
-    makeConstellationLine(-1.5,-1,-0.5, -0.5,-1.8,-0.3),
-    makeConstellationLine(-0.5,-1.8,-0.3, 0.8,-1.5,-0.6),
-    makeConstellationLine(0.8,-1.5,-0.6, 1.8,-2,-1),
+  // Planets
+  var planetData = [
+    {r:1.1, sp:.0005, tilt:Math.PI/4,   sz:.045, col:0xe8e0d0, off:.5},
+    {r:1.8, sp:.0003, tilt:Math.PI/3,   sz:.035, col:0xc8624e, off:2.1},
+    {r:2.6, sp:.0002, tilt:Math.PI/2.4, sz:.05,  col:0x8ab87a, off:.8},
+    {r:3.6, sp:.00015,tilt:Math.PI/6,   sz:.04,  col:0xc8a97e, off:3.7},
+    {r:4.8, sp:.0001, tilt:Math.PI/1.8, sz:.04,  col:0xe8d08a, off:1.4},
   ];
-  constLines.forEach(l => lineGroup.add(l));
+  var planets = planetData.map(function(p) {
+    var m = new THREE.Mesh(
+      new THREE.SphereGeometry(p.sz, 8, 8),
+      new THREE.MeshBasicMaterial({
+        color: p.col, transparent: true, opacity: 0,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    m.userData = {r:p.r, sp:p.sp, tilt:p.tilt, angle:p.off};
+    scene.add(m);
+    return m;
+  });
 
-  // ── Camera animation path ─────────────────────────────────────────────────
-  // Starts far away, slowly drifts in and around
-  camera.position.set(0, 2, 18);
-  camera.lookAt(0, 0, 0);
+  // Core glow
+  var glowM = new THREE.Mesh(
+    new THREE.SphereGeometry(.08, 16, 16),
+    new THREE.MeshBasicMaterial({color:0xc8a96e, transparent:true, opacity:0, blending:THREE.AdditiveBlending})
+  );
+  var haloM = new THREE.Mesh(
+    new THREE.SphereGeometry(.4, 16, 16),
+    new THREE.MeshBasicMaterial({color:0xc8a96e, transparent:true, opacity:0, blending:THREE.AdditiveBlending, side:THREE.BackSide})
+  );
+  scene.add(glowM, haloM);
 
-  // ── Easing ────────────────────────────────────────────────────────────────
-  function ease(t) { return t < .5 ? 2*t*t : -1+(4-2*t)*t; }
+  // ── Easing ──────────────────────────────────────────────────────────────
+  function ease(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; }
   function clamp(v,a,b) { return Math.max(a,Math.min(b,v)); }
   function prog(t,s,e) { return clamp((t-s)/(e-s),0,1); }
 
-  // ── Text sequencing ───────────────────────────────────────────────────────
-  let textState = 0;
-  const wordmark  = document.getElementById('intro-wordmark');
-  const skipEl    = document.getElementById('intro-skip');
-  const scrollHint= document.getElementById('intro-scroll-hint');
-
-  // Section elements
-  const secHero       = document.getElementById('isec-hero');
-  const secMission    = document.getElementById('isec-mission');
-  const secConviction = document.getElementById('isec-conviction');
-  const secScope      = document.getElementById('isec-scope');
-
-  function showSection(hideEl, showEl, cb) {
-    if (hideEl) {
-      hideEl.classList.remove('visible');
-      setTimeout(() => { hideEl.classList.remove('active'); }, 900);
-    }
-    setTimeout(() => {
-      if (showEl) {
-        showEl.classList.add('active');
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            showEl.classList.add('visible');
-            if (cb) cb();
-          });
-        });
-      }
-    }, hideEl ? 900 : 0);
-  }
-
-  const textSchedule = [
-    // ── Hero section ──────────────────────────────────────────────────────
-    { at: 1500,  fn: () => wordmark.classList.add('visible') },
-    { at: 2200,  fn: () => skipEl.classList.add('visible') },
-    { at: 3000,  fn: () => document.getElementById('iline1').classList.add('visible') },
-    { at: 4200,  fn: () => document.getElementById('iline2').classList.add('visible') },
-    { at: 5400,  fn: () => document.getElementById('iline3').classList.add('visible') },
-    { at: 7000,  fn: () => document.getElementById('intro-sub').classList.add('visible') },
-
-    // ── Mission section ───────────────────────────────────────────────────
-    { at: 10500, fn: () => showSection(secHero, secMission, () => {
-        setTimeout(() => document.getElementById('iline-m1').classList.add('visible'), 400);
-        setTimeout(() => document.getElementById('iline-m2').classList.add('visible'), 1400);
-        setTimeout(() => document.getElementById('iline-m3').classList.add('visible'), 2400);
-        setTimeout(() => document.getElementById('intro-sub-m').classList.add('visible'), 3800);
-    })},
-
-    // ── Conviction section ────────────────────────────────────────────────
-    { at: 16500, fn: () => showSection(secMission, secConviction, () => {
-        setTimeout(() => document.getElementById('iconv1').classList.add('visible'), 400);
-        setTimeout(() => document.getElementById('iconv2').classList.add('visible'), 1600);
-        setTimeout(() => document.getElementById('iconv3').classList.add('visible'), 2800);
-    })},
-
-    // ── Scope section ─────────────────────────────────────────────────────
-    { at: 22500, fn: () => showSection(secConviction, secScope, () => {
-        setTimeout(() => document.getElementById('iline-s1').classList.add('visible'), 400);
-        setTimeout(() => document.getElementById('iline-s2').classList.add('visible'), 1400);
-        setTimeout(() => document.getElementById('intro-sub-s').classList.add('visible'), 2800);
-    })},
-
-    // ── End ───────────────────────────────────────────────────────────────
-    { at: 27000, fn: () => scrollHint.classList.add('visible') },
-    { at: 32000, fn: () => endIntro() },
-  ];
-
-  // ── Render loop ───────────────────────────────────────────────────────────
-  const startTime = performance.now();
-  let animId;
+  // ── Render loop (always running) ─────────────────────────────────────────
+  var raf;
+  var t0 = performance.now();
 
   function animate() {
-    animId = requestAnimationFrame(animate);
-    const t   = performance.now() - startTime;
-    const sec = t / 1000;
+    raf = requestAnimationFrame(animate);
+    var t   = performance.now() - t0;
+    var sec = t / 1000;
 
-    // Text schedule — only runs after experience started
-    if (scheduleStart !== null) {
-      const st = performance.now() - scheduleStart;
-      while (textState < textSchedule.length && st >= textSchedule[textState].at) {
-        textSchedule[textState].fn();
-        textState++;
-      }
+    // Stars fade in
+    var sa = ease(prog(t, 0, 3000));
+    s1.material.opacity = sa * .65;
+    s2.material.opacity = sa * .38;
+    s3.material.opacity = sa * .85;
+
+    // Rings fade in
+    ringMeshes.forEach(function(m, i) {
+      var ra = ease(prog(t, 800 + i*250, 2500 + i*250));
+      m.material.opacity = ra * m.userData.target;
+    });
+
+    // Ring rotation
+    ringGroup.rotation.y = sec * .009;
+    ringGroup.rotation.x = Math.sin(sec * .005) * .04;
+
+    // Planets
+    var pa = ease(prog(t, 1500, 3500));
+    planets.forEach(function(m) {
+      var d = m.userData;
+      d.angle += d.sp * 16;
+      m.position.x = d.r * Math.cos(d.angle);
+      m.position.y = d.r * Math.sin(d.angle) * Math.sin(d.tilt);
+      m.position.z = d.r * Math.sin(d.angle) * Math.cos(d.tilt) * .35;
+      m.material.opacity = pa * .82;
+    });
+
+    // Core glow pulse
+    var ga = ease(prog(t, 600, 2000));
+    var pulse = Math.sin(sec * 2.2) * .12 + .88;
+    glowM.material.opacity = ga * pulse;
+    haloM.material.opacity = ga * .07 * pulse;
+    glowM.scale.setScalar(pulse);
+
+    // Star slow drift
+    s1.rotation.y = sec * .0012;
+    s2.rotation.y = sec * .0008;
+    s3.rotation.y = -sec * .0005;
+
+    // Camera — slow pull in (only after experience starts)
+    if (sched !== null) {
+      var et  = performance.now() - sched;
+      var esp = et / 1000;
+      var cp  = ease(clamp(esp / 22, 0, 1));
+      camera.position.x = Math.sin(esp * .018) * 1.4 * (1 - cp * .5);
+      camera.position.y = 1.5 - esp * .035 + Math.cos(esp * .013) * .4;
+      camera.position.z = 16 - cp * 10;
     }
-
-    // ── Camera drift — slow cinematic pull inward ─────────────────────────
-    const camP = ease(clamp(sec / 20, 0, 1));
-    camera.position.x = Math.sin(sec * 0.02) * 1.5 * (1 - camP * 0.5);
-    camera.position.y = 2 - sec * 0.04 + Math.cos(sec * 0.015) * 0.5;
-    camera.position.z = 18 - camP * 12;
     camera.lookAt(0, 0, 0);
-
-    // ── Stars fade in ─────────────────────────────────────────────────────
-    const starA = ease(prog(t, 0, 2000));
-    stars1.material.opacity = starA * 0.7;
-    stars2.material.opacity = starA * 0.4;
-    stars3.material.opacity = starA * 0.9;
-
-    // ── Nebula fade in ────────────────────────────────────────────────────
-    const nebA = ease(prog(t, 500, 3000));
-    neb1.material.opacity = nebA * 0.12;
-    neb2.material.opacity = nebA * 0.10;
-    neb3.material.opacity = nebA * 0.08;
-
-    // ── Rings fade in sequentially ────────────────────────────────────────
-    rings.forEach((ring, i) => {
-      const rA = ease(prog(t, 1500 + i * 300, 3000 + i * 300));
-      ring.material.opacity = rA * ring.userData.targetOpacity;
-    });
-
-    // ── Ring group slow rotation ──────────────────────────────────────────
-    ringGroup.rotation.y = sec * 0.008;
-    ringGroup.rotation.x = Math.sin(sec * 0.005) * 0.05;
-
-    // ── Planet orbits ─────────────────────────────────────────────────────
-    const planetA = ease(prog(t, 2000, 4000));
-    planetMeshes.forEach((mesh, i) => {
-      const d = mesh.userData;
-      d.angle += d.speed * 16;
-      const r = d.radius;
-      const tilt = d.tilt;
-      mesh.position.x = r * Math.cos(d.angle);
-      mesh.position.y = r * Math.sin(d.angle) * Math.sin(tilt);
-      mesh.position.z = r * Math.sin(d.angle) * Math.cos(tilt) * 0.4;
-      mesh.material.opacity = planetA * 0.85;
-    });
-
-    // ── Central glow pulse ────────────────────────────────────────────────
-    const glowA = ease(prog(t, 1000, 2500));
-    const pulse = Math.sin(sec * 2.5) * 0.15 + 0.85;
-    glow.material.opacity = glowA * pulse;
-    halo.material.opacity = glowA * 0.08 * pulse;
-    glow.scale.setScalar(pulse);
-
-    // ── Constellation lines ───────────────────────────────────────────────
-    const lineA = ease(prog(t, 3500, 5500));
-    constLines.forEach((l, i) => {
-      l.material.opacity = lineA * (0.15 - i * 0.01);
-    });
-
-    // ── Stars slow rotation ───────────────────────────────────────────────
-    stars1.rotation.y = sec * 0.001;
-    stars2.rotation.y = sec * 0.0008;
-    stars3.rotation.y = -sec * 0.0005;
 
     renderer.render(scene, camera);
   }
   animate();
 
-  // ── End / skip ────────────────────────────────────────────────────────────
+  // ── Content sections ─────────────────────────────────────────────────────
+  var sections = [
+    {
+      label: '—',
+      html: [
+        '<div class="iline" id="il1"><span>Vedic Astrology has guided</span></div>',
+        '<div class="iline" id="il2"><span>humanity for <span class="gold">millennia.</span></span></div>',
+        '<div class="iline" id="il3"><span>We are here to <span class="gold">witness why.</span></span></div>',
+        '<p class="isub" id="is1">An initiative dedicated to witnessing the depth of Vedic Astrology — where ancient Jyotish wisdom meets the precision of modern data science.</p>'
+      ].join(''),
+      seq: [
+        {at:1200, fn: function() { show('il1'); }},
+        {at:2600, fn: function() { show('il2'); }},
+        {at:4000, fn: function() { show('il3'); }},
+        {at:6000, fn: function() { show('is1'); }},
+      ]
+    },
+    {
+      label: 'Our Mission',
+      html: [
+        '<div class="iline" id="im1"><span>We are not here to question.</span></div>',
+        '<div class="iline" id="im2"><span>We are not here to understand.</span></div>',
+        '<div class="iline" id="im3"><span>We are here to <span class="gold">witness.</span></span></div>',
+        '<p class="isub" id="is2">Vedic Astrology is not just a belief system — it is a living knowledge. We are here to deepen it, strengthen it, and witness it at a level never before possible.</p>'
+      ].join(''),
+      seq: [
+        {at:800,  fn: function() { show('im1'); }},
+        {at:2000, fn: function() { show('im2'); }},
+        {at:3200, fn: function() { show('im3'); }},
+        {at:5000, fn: function() { show('is2'); }},
+      ]
+    },
+    {
+      label: 'What We Believe',
+      html: [
+        '<div class="iconv-list">',
+        '<div class="iconv" id="ic1"><span class="iconv-n">01</span><span class="iconv-t">The universe operates on <em>patterns.</em> Ancient observers mapped them with extraordinary precision across millennia.</span></div>',
+        '<div class="iconv" id="ic2"><span class="iconv-n">02</span><span class="iconv-t">Vedic Astrology is a <em>living knowledge.</em> We are here to deepen and strengthen belief — not question it.</span></div>',
+        '<div class="iconv" id="ic3"><span class="iconv-n">03</span><span class="iconv-t">We now have the computational power to <em>go further.</em> The patterns are there. It is only a matter of witnessing correctly.</span></div>',
+        '</div>'
+      ].join(''),
+      seq: [
+        {at:600,  fn: function() { show('ic1'); }},
+        {at:1800, fn: function() { show('ic2'); }},
+        {at:3000, fn: function() { show('ic3'); }},
+      ]
+    },
+    {
+      label: 'The Scope',
+      html: [
+        '<div class="iline" id="is11"><span>Every life. Every moment.</span></div>',
+        '<div class="iline" id="is12"><span>Every <span class="gold">pattern.</span></span></div>',
+        '<p class="isub" id="is3">From the unfolding of a single human life to the rise and fall of civilisations — personal events, world events, the visible and the invisible. All within scope.</p>'
+      ].join(''),
+      seq: [
+        {at:800,  fn: function() { show('is11'); }},
+        {at:2200, fn: function() { show('is12'); }},
+        {at:4000, fn: function() { show('is3'); }},
+      ]
+    }
+  ];
+
+  function show(id) {
+    var el = document.getElementById(id);
+    if (el) {
+      requestAnimationFrame(function() {
+        el.classList.add('show');
+      });
+    }
+  }
+
+  // Section timing: each section lasts ~9s
+  var secDurations = [9500, 8500, 8500, 9000];
+  var secTimers    = [];
+
+  function loadSection(idx) {
+    if (idx >= sections.length) {
+      // All done — end intro
+      setTimeout(endIntro, 2000);
+      return;
+    }
+    var sec = sections[idx];
+
+    // Update label
+    var labelEl = document.getElementById('isec-label');
+    if (labelEl) {
+      labelEl.classList.remove('show');
+      setTimeout(function() {
+        labelEl.textContent = sec.label;
+        labelEl.classList.add('show');
+      }, 300);
+    }
+
+    // Fade out body, swap content, fade in
+    bodyEl.style.opacity = '0';
+    bodyEl.style.transition = 'opacity .7s ease';
+    setTimeout(function() {
+      bodyEl.innerHTML = '<span class="isec-label show" id="isec-label">' + sec.label + '</span>' + sec.html;
+      bodyEl.style.opacity = '1';
+
+      // Run sequence
+      sec.seq.forEach(function(step) {
+        secTimers.push(setTimeout(step.fn, step.at));
+      });
+
+      // Schedule next section
+      secTimers.push(setTimeout(function() {
+        loadSection(idx + 1);
+      }, secDurations[idx]));
+
+    }, idx === 0 ? 0 : 700);
+  }
+
+  // ── Gate → Start ─────────────────────────────────────────────────────────
+  gateBtn.addEventListener('click', function() {
+    // Start audio — guaranteed inside click handler
+    audio.play().then(function() {
+      if (!muted) fadeVol(0.45, 2500);
+    }).catch(function(){});
+
+    // Hide gate
+    gateEl.classList.add('hiding');
+    setTimeout(function() { gateEl.style.display = 'none'; }, 1000);
+
+    // Show content
+    sched = performance.now();
+    setTimeout(function() {
+      contentEl.classList.add('show');
+      itop.classList.add('show');
+      loadSection(0);
+    }, 600);
+
+    // Show enter hint at end
+    setTimeout(function() {
+      ienter.classList.add('show');
+    }, 28000);
+  });
+
+  // ── Skip ──────────────────────────────────────────────────────────────────
+  iskip.addEventListener('click', function(e) {
+    e.stopPropagation();
+    endIntro();
+  });
+
+  // ── End ───────────────────────────────────────────────────────────────────
   function endIntro() {
-    if (skipped) return;
-    skipped = true;
-    cancelAnimationFrame(animId);
-    fadeAudio(0, 1200);
-    overlay.classList.add('fade-out');
-    setTimeout(() => {
-      overlay.style.display = 'none';
+    if (ended) return;
+    ended = true;
+    secTimers.forEach(clearTimeout);
+    cancelAnimationFrame(raf);
+    fadeVol(0, 1200);
+    introEl.classList.add('fade-out');
+    setTimeout(function() {
+      introEl.style.display = 'none';
       renderer.dispose();
     }, 1300);
   }
 
-  function skipIntro() {
-    if (skipped) return;
-    skipped = true;
-    cancelAnimationFrame(animId);
-    // Run all remaining text schedules instantly
-    textSchedule.slice(textState).forEach(s => s.fn && s.fn());
-    fadeAudio(0, 800);
-    overlay.classList.add('fade-out');
-    setTimeout(() => {
-      overlay.style.display = 'none';
-      renderer.dispose();
-    }, 900);
-  }
-
-  overlay.addEventListener('click', skipIntro);
-  document.addEventListener('keydown', e => { if (e.key !== 'Tab') skipIntro(); });
-
-  // ── Replay ────────────────────────────────────────────────────────────────
-  document.getElementById('replay-btn').addEventListener('click', () => {
-    window.location.reload();
-  });
-
   // ── Resize ────────────────────────────────────────────────────────────────
-  window.addEventListener('resize', () => {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
+  window.addEventListener('resize', function() {
+    W = window.innerWidth; H = window.innerHeight;
+    renderer.setSize(W, H);
+    camera.aspect = W / H;
     camera.updateProjectionMatrix();
   });
+
 })();
+
 
 
 </script>
