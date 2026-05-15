@@ -703,9 +703,6 @@ footer {
     <path d="M11.5 5.5a3.5 3.5 0 010 5M13.5 3.5a6.5 6.5 0 010 9" class="sound-waves"/>
   </svg>
 </button>
-<audio id="ambient-audio" loop>
-  <source src="https://cdn.pixabay.com/audio/2022/10/16/audio_16b27d9e1e.mp3" type="audio/mpeg">
-</audio>
 
 <!-- Navigation -->
 <nav id="navbar">
@@ -1401,12 +1398,6 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   });
 })();
 
-
-// ── Nav scroll ────────────────────────────────────────────────────────────────
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 60);
-});
 
 // ── Scroll reveal ─────────────────────────────────────────────────────────────
 const observer = new IntersectionObserver(entries => {
